@@ -8,7 +8,8 @@
 	<script type="text/javascript" src="webgl-utils.js"></script>
 	
 	<script id="shader-vs" type="x-shader/x-vertex">
-		attribute vec3 aVertexPosition;
+		//attribute vec3 aVertexPosition;
+		attribute vec2 aVertexPosition;
 		attribute vec2 aTextureCoord;
 
 		// dstX,dstY, dstW, dstH
@@ -25,8 +26,9 @@
 		varying vec2 vTextureCoord;
 		
 		void main(void) {
-			gl_Position     = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
-			//gl_Position     = vec4(aVertexPosition, 1.0);
+			//gl_Position     = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+			//gl_Position     = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+			gl_Position     = vec4(aVertexPosition.x, aVertexPosition.y, 0, 1.0);
 			vTextureCoord   = aTextureCoord;
 		}
 	</script>

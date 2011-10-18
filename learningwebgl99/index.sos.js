@@ -80,7 +80,7 @@
 
 	function handleLoadedTexture(texture) {
 		gl.bindTexture(gl.TEXTURE_2D, texture);
-		//gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+		gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
 		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, texture.image);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
@@ -141,19 +141,13 @@ function initBuffers() {
 		return (x - viewportW/2) / (viewportW/2);
 	}
 	var pixelYToPosition	= function(y){
-		return - (y - viewportH/2) / (viewportH/2);
+		return (x - viewportH/2) / (viewportH/2);
 	}
 	var buildPosition	= function(x,y, width, height){
 		var minX	= pixelXToPosition(x);
-		var maxX	= pixelXToPosition(x+width);
+		var maxX	= pixelXToPosition(x+width-1);
 		var minY	= pixelYToPosition(y);
-		var maxY	= pixelYToPosition(y+height);
-		return [
-			minX, minY,
-			maxX, minY,
-			maxX, maxY,
-			minX, maxY
-		];
+		var maxY	= pixelYToPosition(y+height-1);
 	}
 	
 	cubeVertexPositionBuffer = gl.createBuffer();
@@ -165,22 +159,12 @@ function initBuffers() {
 		 1.0,  1.0,  0.0,
 		-1.0,  1.0,  0.0,
 	];
-	vertices = [
-	// TODO this should be 2D
-		-1.0, -1.0,
-		 1.0, -1.0,
-		 1.0,  1.0,
-		-1.0,  1.0,
-	];
-	vertices	= buildPosition(0,0,512,512);
-console.log("vertice", vertices)
 	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
-	cubeVertexPositionBuffer.itemSize = 2;
+	cubeVertexPositionBuffer.itemSize = 3;
 	cubeVertexPositionBuffer.numItems = 4;
 	
 	cubeVertexTextureCoordBuffer = gl.createBuffer();
 	gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexTextureCoordBuffer);
-	// here to push the src vector
 	var textureCoords = [
 		0.0, 0.0,
 		1.0, 0.0,
