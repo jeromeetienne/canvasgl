@@ -75,28 +75,21 @@ function initShaders() {
 	shaderProgram.samplerUniform	= gl.getUniformLocation(shaderProgram, "uSampler");
 }
 
-
-function handleLoadedTexture(texture) {
-	gl.bindTexture(gl.TEXTURE_2D, texture);
-	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, texture.image);
-	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-	gl.bindTexture(gl.TEXTURE_2D, null);
-}
-
-
-var neheTexture;
-
+var	neheTexture;
 function initTexture() {
-	neheTexture = gl.createTexture();
-	neheTexture.image = new Image();
-	neheTexture.image.onload = function () {
-		handleLoadedTexture(neheTexture)
+	var texture	= gl.createTexture();
+	var image	= new Image();
+	image.onload	= function(){
+		gl.bindTexture(gl.TEXTURE_2D, texture);
+		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+		gl.bindTexture(gl.TEXTURE_2D, null);
 	}
+	image.src	= "nehe.gif";
 	
-	neheTexture.image.src = "nehe.gif";
+	neheTexture	= texture;
 }
-
 
 
 var squareVertexPositionBuffer;
