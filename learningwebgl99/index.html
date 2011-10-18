@@ -10,7 +10,15 @@
 	<script id="shader-vs" type="x-shader/x-vertex">
 		attribute vec3 aVertexPosition;
 		attribute vec2 aTextureCoord;
+
+		// dstX,dstY, dstW, dstH
+		// - this is only the normal square coordinate
+		// - learn how to put them in 2D coordintates from js
+		// srcX,srcY, srcW, srcH
+		// - this is the texture coordinate no more no less
 		
+		// texture
+
 		uniform mat4 uMVMatrix;
 		uniform mat4 uPMatrix;
 		
@@ -42,7 +50,7 @@
 
 
 <body onload="webGLStart();">
-	<canvas id="lesson05-canvas" style="border: none;" width="500" height="500"></canvas>
+	<canvas id="lesson05-canvas" style="border: none;" width="512" height="512"></canvas>
 </body>
 
 </html>
