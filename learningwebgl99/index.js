@@ -132,7 +132,7 @@ function initBuffers() {
 console.log("vertice", vertices)
 	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
 	squareVertexPositionBuffer.itemSize = 2;
-	squareVertexPositionBuffer.numItems = 4;
+	squareVertexPositionBuffer.numItems = vertices/squareVertexPositionBuffer.itemSize;
 	
 	squareVertexTextureCoordBuffer = gl.createBuffer();
 	gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexTextureCoordBuffer);
@@ -157,24 +157,24 @@ console.log("vertice", vertices)
 	squareVertexIndexBuffer.numItems = 6;
 };
 
-    function drawScene() {
-        gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
-        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
-	gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBuffer);
-	gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, squareVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
-	
-	gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexTextureCoordBuffer);
-	gl.vertexAttribPointer(shaderProgram.textureCoordAttribute, squareVertexTextureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0);
-
-	gl.activeTexture(gl.TEXTURE0);
-	gl.bindTexture(gl.TEXTURE_2D, neheTexture);
-	gl.uniform1i(shaderProgram.samplerUniform, 0);
-
-// TODO this should be triangle strip
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, squareVertexIndexBuffer);
-        gl.drawElements(gl.TRIANGLES, squareVertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
-    }
+	function drawScene() {
+		gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
+		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+	    
+		gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBuffer);
+		gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, squareVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+		
+		gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexTextureCoordBuffer);
+		gl.vertexAttribPointer(shaderProgram.textureCoordAttribute, squareVertexTextureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0);
+	    
+		gl.activeTexture(gl.TEXTURE0);
+		gl.bindTexture(gl.TEXTURE_2D, neheTexture);
+		gl.uniform1i(shaderProgram.samplerUniform, 0);
+	    
+	    // TODO this should be triangle strip
+		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, squareVertexIndexBuffer);
+		gl.drawElements(gl.TRIANGLES, squareVertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+	}
 
 
     function tick() {
