@@ -1,0 +1,56 @@
+
+<html>
+
+<head>
+<title>Learning WebGL &mdash; lesson 2</title>
+<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+
+<script type="text/javascript" src="glMatrix-0.9.5.min.js"></script>
+
+<script id="shader-vs" type="x-shader/x-vertex">
+	attribute vec3 aVertexPosition;
+	attribute vec4 aVertexColor;
+	attribute vec2 aTextureCoord;
+
+	varying vec2 vTextureCoord;
+	varying vec4 vColor;
+	
+	uniform mat4 uMVMatrix;
+	uniform mat4 uPMatrix;	
+	
+	void main(void) {
+		gl_Position	= uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+
+		vColor		= aVertexColor;
+		vTextureCoord	= aTextureCoord;
+	}
+</script>
+<script id="shader-fs" type="x-shader/x-fragment">
+	#ifdef GL_ES
+		precision highp float;
+	#endif
+
+	varying vec4		vColor;
+	varying vec2		vTextureCoord;	
+
+	uniform sampler2D	uSampler;
+
+	void main(void) {
+		gl_FragColor = vec4(0,0.3,0,1);
+		gl_FragColor += vec4(vTextureCoord.s,0,0,1);
+		//gl_FragColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
+	}
+</script>
+
+
+
+<script src="index.js" type="text/javascript"></script>
+
+</head>
+
+
+<body onload="onLoad();">
+	<canvas id="lesson02-canvas" style="border: none;" width="500" height="500"></canvas>
+</body>
+
+</html>
