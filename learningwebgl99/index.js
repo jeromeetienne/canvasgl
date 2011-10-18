@@ -1,53 +1,53 @@
-	var gl;
-	
-	function initGL(canvas) {
-	    try {
-		gl = canvas.getContext("experimental-webgl");
+var gl;
+
+function initGL(canvas) {
+	try {
+		gl	= canvas.getContext("experimental-webgl");
 		gl.viewportWidth = canvas.width;
 		gl.viewportHeight = canvas.height;
-	    } catch (e) {
-	    }
-	    if (!gl) {
+	} catch (e) {
+	}
+	if (!gl) {
 		alert("Could not initialise WebGL, sorry :-(");
-	    }
+	}
+}
+
+
+function getShader(gl, id) {
+	var shaderScript = document.getElementById(id);
+	if (!shaderScript) {
+		return null;
 	}
 	
-	
-	function getShader(gl, id) {
-	    var shaderScript = document.getElementById(id);
-	    if (!shaderScript) {
-		return null;
-	    }
-	
-	    var str = "";
-	    var k = shaderScript.firstChild;
-	    while (k) {
+	var str = "";
+	var k = shaderScript.firstChild;
+	while (k) {
 		if (k.nodeType == 3) {
-		    str += k.textContent;
+			str += k.textContent;
 		}
 		k = k.nextSibling;
-	    }
-	
-	    var shader;
-	    if (shaderScript.type == "x-shader/x-fragment") {
-		shader = gl.createShader(gl.FRAGMENT_SHADER);
-	    } else if (shaderScript.type == "x-shader/x-vertex") {
-		shader = gl.createShader(gl.VERTEX_SHADER);
-	    } else {
-		return null;
-	    }
-	
-	    gl.shaderSource(shader, str);
-	    gl.compileShader(shader);
-	
-	    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-		alert(gl.getShaderInfoLog(shader));
-		return null;
-	    }
-	
-	    return shader;
 	}
 	
+	var shader;
+	if (shaderScript.type == "x-shader/x-fragment") {
+		shader = gl.createShader(gl.FRAGMENT_SHADER);
+	} else if (shaderScript.type == "x-shader/x-vertex") {
+		shader = gl.createShader(gl.VERTEX_SHADER);
+	} else {
+		return null;
+	}
+	
+	gl.shaderSource(shader, str);
+	gl.compileShader(shader);
+	
+	if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+		alert(gl.getShaderInfoLog(shader));
+		return null;
+	}
+	
+	return shader;
+}
+
 	
 var shaderProgram;
 
@@ -80,11 +80,11 @@ function initTexture() {
 	var texture	= gl.createTexture();
 	var image	= new Image();
 	image.onload	= function(){
-		gl.bindTexture(gl.TEXTURE_2D, texture);
-		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+		gl.bindTexture	(gl.TEXTURE_2D, texture);
+		gl.texImage2D	(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-		gl.bindTexture(gl.TEXTURE_2D, null);
+		gl.bindTexture	(gl.TEXTURE_2D, null);
 	}
 	image.src	= "nehe.gif";
 	
@@ -121,33 +121,44 @@ function initBuffers() {
 	
 	squareVertexPositionBuffer = gl.createBuffer();
 	gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBuffer);
-	var vertices 	= buildPosition(0,0,512,512);
+	var vertices 	= [];
+	vertices	= vertices.concat( buildPosition(0,0,50,50) );
+	vertices	= vertices.concat( buildPosition(150,50,150,50) );
 console.log("vertice", vertices)
 	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
 	squareVertexPositionBuffer.itemSize = 2;
-	squareVertexPositionBuffer.numItems = vertices/squareVertexPositionBuffer.itemSize;
-	
+	squareVertexPositionBuffer.numItems = vertices.length/squareVertexPositionBuffer.itemSize;
+
+var nbSquare	= vertices.length/8;
+
 	squareVertexTextureCoordBuffer = gl.createBuffer();
 	gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexTextureCoordBuffer);
 	// here to push the src vectors
-	var textureCoords = [
-		0.0, 0.0,
-		1.0, 0.0,
-		1.0, 1.0,
-		0.0, 1.0,
-	];
+	var textureCoords = [];
+	for(var i=0; i < nbSquare; i++) {
+		textureCoords = textureCoords.concat([
+			0.0, 0.0,
+			1.0, 0.0,
+			1.0, 1.0,
+			0.0, 1.0,
+		]);
+        }
 	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoords), gl.STATIC_DRAW);
 	squareVertexTextureCoordBuffer.itemSize = 2;
-	squareVertexTextureCoordBuffer.numItems = 4;
+	squareVertexTextureCoordBuffer.numItems = textureCoords.length/squareVertexTextureCoordBuffer.itemSize;
 	
 	squareVertexIndexBuffer = gl.createBuffer();
 	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, squareVertexIndexBuffer);
-	var squareVertexIndices = [
-		0, 1, 2,      0, 2, 3,    // Front face
-	];
+	var squareVertexIndices = [];
+	for(var i=0; i < nbSquare; i++) {
+		squareVertexIndices = squareVertexIndices.concat([
+			i*4 + 0, i*4 + 1, i*4 + 2,
+			i*4 + 0, i*4 + 2, i*4 + 3,    // Front face
+		]);
+        }
 	gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(squareVertexIndices), gl.STATIC_DRAW);
 	squareVertexIndexBuffer.itemSize = 1;
-	squareVertexIndexBuffer.numItems = 6;
+	squareVertexIndexBuffer.numItems = squareVertexIndices.length/squareVertexIndexBuffer.itemSize;
 };
 
 	function drawScene() {
