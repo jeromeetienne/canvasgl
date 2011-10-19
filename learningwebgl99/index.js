@@ -1,5 +1,19 @@
 var gl;
 
+/**
+ * Provides requestAnimationFrame in a cross browser way.
+ */
+window.requestAnimFrame = (function() {
+	return window.requestAnimationFrame ||
+		window.webkitRequestAnimationFrame ||
+		window.mozRequestAnimationFrame ||
+		window.oRequestAnimationFrame ||
+		window.msRequestAnimationFrame ||
+		function(/* function FrameRequestCallback */ callback, /* DOMElement Element */ element) {
+			window.setTimeout(callback, 1000/60);
+		};
+})();
+
 function initGL(canvas) {
 	try {
 		gl	= canvas.getContext("experimental-webgl");
@@ -52,10 +66,9 @@ function getShader(gl, id) {
 var shaderProgram;
 
 function initShaders() {
-	var fragmentShader = getShader(gl, "shader-fs");
-	var vertexShader = getShader(gl, "shader-vs");
-    
-	shaderProgram = gl.createProgram();
+	var fragmentShader	= getShader(gl, "shader-fs");
+	var vertexShader	= getShader(gl, "shader-vs");
+	shaderProgram		= gl.createProgram();
 	gl.attachShader(shaderProgram, vertexShader);
 	gl.attachShader(shaderProgram, fragmentShader);
 	gl.linkProgram(shaderProgram);
@@ -66,13 +79,13 @@ function initShaders() {
     
 	gl.useProgram(shaderProgram);
     
-	shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "aVertexPosition");
+	shaderProgram.vertexPositionAttribute	= gl.getAttribLocation(shaderProgram, "aVertexPosition");
 	gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
-    
-	shaderProgram.textureCoordAttribute = gl.getAttribLocation(shaderProgram, "aTextureCoord");
+
+	shaderProgram.textureCoordAttribute	= gl.getAttribLocation(shaderProgram, "aTextureCoord");
 	gl.enableVertexAttribArray(shaderProgram.textureCoordAttribute);
-    
-	shaderProgram.samplerUniform	= gl.getUniformLocation(shaderProgram, "uSampler");
+
+	shaderProgram.samplerUniform		= gl.getUniformLocation(shaderProgram, "uSampler");
 }
 
 var	neheTexture;
@@ -86,8 +99,8 @@ function initTexture() {
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
 		gl.bindTexture	(gl.TEXTURE_2D, null);
 	}
-	image.src	= "nehe.gif";
-	
+	image.src	= "images/nehe.gif";
+
 	neheTexture	= texture;
 }
 
@@ -122,20 +135,28 @@ function initBuffers() {
 	squareVertexPositionBuffer = gl.createBuffer();
 	gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBuffer);
 	var vertices 	= [];
-	vertices	= vertices.concat( buildPosition(0,0,50,50) );
-	vertices	= vertices.concat( buildPosition(150,50,150,50) );
-console.log("vertice", vertices)
+	//vertices	= vertices.concat( buildPosition(0,0,512,512) );
+	for( var i = 0; i < 1000; i++){
+		vertices = vertices.concat( buildPosition(Math.random()*512,Math.random()*512, 64,64) );		
+	}
+	vertices = vertices.concat(vertices);
+	//vertices = vertices.concat(vertices);
+	//vertices = vertices.concat(vertices);
+	//vertices = vertices.concat(vertices);
+	//vertices = vertices.concat(vertices);
+	
 	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
 	squareVertexPositionBuffer.itemSize = 2;
 	squareVertexPositionBuffer.numItems = vertices.length/squareVertexPositionBuffer.itemSize;
 
 var nbSquare	= vertices.length/8;
+console.log("nbsquare", nbSquare)
 
 	squareVertexTextureCoordBuffer = gl.createBuffer();
 	gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexTextureCoordBuffer);
 	// here to push the src vectors
 	var textureCoords = [];
-	for(var i=0; i < nbSquare; i++) {
+	for(var i=0; i < nbSquare; i++){
 		textureCoords = textureCoords.concat([
 			0.0, 0.0,
 			1.0, 0.0,
@@ -161,41 +182,42 @@ var nbSquare	= vertices.length/8;
 	squareVertexIndexBuffer.numItems = squareVertexIndices.length/squareVertexIndexBuffer.itemSize;
 };
 
-	function drawScene() {
-		gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
-		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-	    
-		gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBuffer);
-		gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, squareVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
-		
-		gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexTextureCoordBuffer);
-		gl.vertexAttribPointer(shaderProgram.textureCoordAttribute, squareVertexTextureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0);
-	    
-		gl.activeTexture(gl.TEXTURE0);
-		gl.bindTexture(gl.TEXTURE_2D, neheTexture);
-		gl.uniform1i(shaderProgram.samplerUniform, 0);
-	    
-	    // TODO this should be triangle strip
-		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, squareVertexIndexBuffer);
-		gl.drawElements(gl.TRIANGLES, squareVertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
-	}
+function drawScene() {
+	gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
+	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    
+	gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBuffer);
+	gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, squareVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+	
+	gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexTextureCoordBuffer);
+	gl.vertexAttribPointer(shaderProgram.textureCoordAttribute, squareVertexTextureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0);
+    
+	gl.activeTexture(gl.TEXTURE0);
+	gl.bindTexture(gl.TEXTURE_2D, neheTexture);
+	gl.uniform1i(shaderProgram.samplerUniform, 0);
+    
+	// TODO this should be triangle strip ? trigrou says no
+	// - so unclear at best. gl.TRIANGLES are simple. leave them for now
+	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, squareVertexIndexBuffer);
+	gl.drawElements(gl.TRIANGLES, squareVertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+}
 
 
-    function tick() {
-        requestAnimFrame(tick);
-        drawScene();
-    }
+function tick() {
+	requestAnimFrame(tick);
+	drawScene();
+}
 
 
-    function webGLStart() {
-        var canvas = document.getElementById("lesson05-canvas");
-        initGL(canvas);
-        initShaders();
-        initBuffers();
-        initTexture();
+function webGLStart() {
+    var canvas = document.getElementById("lesson05-canvas");
+    initGL(canvas);
+    initShaders();
+    initBuffers();
+    initTexture();
 
-        gl.clearColor(0.0, 0.0, 0.0, 1.0);
-        gl.enable(gl.DEPTH_TEST);
+    gl.clearColor(0.0, 0.0, 0.0, 1.0);
+    gl.enable(gl.DEPTH_TEST);
 
-        tick();
-    }
+    tick();
+}

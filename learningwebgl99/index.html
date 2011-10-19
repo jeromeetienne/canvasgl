@@ -1,12 +1,9 @@
 <html>
 
 <head>
-<title>Learning WebGL &mdash; lesson 5</title>
-<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+	<title>canvas on webgl</title>
+	<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
 
-	<script type="text/javascript" src="glMatrix-0.9.5.min.js"></script>
-	<script type="text/javascript" src="webgl-utils.js"></script>
-	
 	<script id="shader-vs" type="x-shader/x-vertex">
 		//attribute vec3 aVertexPosition;
 		attribute vec2 aVertexPosition;
@@ -19,15 +16,10 @@
 		// - this is the texture coordinate no more no less
 		
 		// texture
-
-		uniform mat4 uMVMatrix;
-		uniform mat4 uPMatrix;
 		
 		varying vec2 vTextureCoord;
 		
 		void main(void) {
-			//gl_Position     = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
-			//gl_Position     = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
 			gl_Position     = vec4(aVertexPosition.x, aVertexPosition.y, 0, 1.0);
 			vTextureCoord   = aTextureCoord;
 		}
