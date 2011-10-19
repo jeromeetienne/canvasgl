@@ -3,6 +3,7 @@
 CanvasGL.Context	= function(domElement)
 {
 	this._domElement	= domElement;
+	this._drawImages	= [];
 }
 
 CanvasGL.Context.prototype.drawImage	= function(imgElement)
@@ -38,4 +39,17 @@ CanvasGL.Context.prototype.drawImage	= function(imgElement)
 
 	var ctx	= this._domElement.getContext('2d');
 	ctx.drawImage(imgElement, srcX, srcY, srcW, srcH, dstX, dstY, dstW, dstH);
+return;
+	// queue this in the drawImages array
+	drawImages.push({
+		img	: imgElement,
+		srcX	: srcX,
+		srcY	: srcY,
+		srcW	: srcW,
+		srcH	: srcH,
+		dstX	: dstX,
+		dstY	: dstY,
+		dstW	: dstW,
+		dstH	: dstH
+	});
 }

@@ -1,3 +1,4 @@
+/** namespace */
 var CanvasGL	= CanvasGL	|| {};
 
 /**
