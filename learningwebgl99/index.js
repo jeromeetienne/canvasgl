@@ -38,6 +38,10 @@ function buildDrawImages()
 	return drawImages;
 }
 
+/**
+ * TODO make the pixel to clip coordinate conversion in gpu
+ * - viewportW, viewportH in uniforms
+*/
 function initBuffers(gl, drawImages)
 {
 	var viewportW	= gl.viewportWidth;
@@ -61,7 +65,7 @@ function initBuffers(gl, drawImages)
 		positions.push(minX);	positions.push(maxY);
 	};
 
-	squareVertexPositionBuffer = gl.createBuffer();
+	squareVertexPositionBuffer	= gl.createBuffer();
 	gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBuffer);
 
 	var vertices 	= [];
@@ -78,7 +82,7 @@ function initBuffers(gl, drawImages)
 	var nbSquare	= vertices.length/8;
 	console.log("nbsquare", nbSquare);
 
-	squareTextureCoordBuffer = gl.createBuffer();
+	squareTextureCoordBuffer	= gl.createBuffer();
 	gl.bindBuffer(gl.ARRAY_BUFFER, squareTextureCoordBuffer);
 	// here to push the src vectors
 	var textureCoords = [];
@@ -97,11 +101,12 @@ function initBuffers(gl, drawImages)
 	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, squareVertexIndexBuffer);
 	var squareVertexIndices = [];
 	for(var i=0; i < nbSquare; i++) {
-		squareVertexIndices = squareVertexIndices.concat([
-			i*4 + 0, i*4 + 1, i*4 + 2,
-			i*4 + 0, i*4 + 2, i*4 + 3
-		]);
-        }
+		// face one
+		squareVertexIndices.push(i*4+0);	squareVertexIndices.push(i*4+1);	squareVertexIndices.push(i*4+2);
+		// face two
+		squareVertexIndices.push(i*4+0);	squareVertexIndices.push(i*4+2);	squareVertexIndices.push(i*4+3);
+	}
+	
 	gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(squareVertexIndices), gl.STATIC_DRAW);
 	squareVertexIndexBuffer.itemSize = 1;
 	squareVertexIndexBuffer.numItems = squareVertexIndices.length/squareVertexIndexBuffer.itemSize;
