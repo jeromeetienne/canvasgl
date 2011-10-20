@@ -26,12 +26,17 @@ function buildDrawImages()
 	var viewportW	= gl.viewportWidth;
 	var viewportH	= gl.viewportHeight;
 	var drawImages	= [];
-	for( var i = 0; i < 10; i++){
+	for( var i = 0; i < 1000; i++){
 		var drawImage	= {
-			dstX	: Math.random()*viewportW,
-			dstY	: Math.random()*viewportH,
+			dstX	: Math.random()*(viewportW-64),
+			dstY	: Math.random()*(viewportH-64),
 			dstW	: 64,
-			dstH	: 64
+			dstH	: 64,
+
+			srcX	: 0,
+			srcY	: 0,
+			srcW	: 256,
+			srcH	: 256
 		};
 		drawImages.push(drawImage);
 	};
@@ -40,15 +45,20 @@ function buildDrawImages()
 
 /**
  * TODO make the pixel to clip coordinate conversion in gpu
+ * - twice shorter items for vexterxPos textureCoord
+ * - passing them as int16 instead of float ?
+ * - use drawElement or drawArray
+ *   - http://stackoverflow.com/questions/4998278/is-there-a-limit-of-vertices-in-webgl
+ *   - http://stackoverflow.com/questions/6527791/webgl-buffer-size-limit
  * - viewportW, viewportH in uniforms
 */
-function initBuffers(gl, drawImages)
+
+function initVertexPositionsBuffers(gl, drawImages)
 {
 	var viewportW	= gl.viewportWidth;
 	var viewportH	= gl.viewportHeight;
 
-
-	var appendPosition	= function(positions, x,y, width, height){
+	var appendVertexPosition	= function(positions, x,y, width, height){
 		var pixelXToPosition	= function(x){
 			return (x - viewportW/2) / (viewportW/2);
 		};
@@ -72,26 +82,84 @@ function initBuffers(gl, drawImages)
 	for( var i = 0; i < drawImages.length; i++){
 // dstX, dstY, dstW, dstH
 		var drawImage	= drawImages[i];
-		appendPosition(vertices, drawImage.dstX, drawImage.dstY, drawImage.dstW, drawImage.dstH);
+		appendVertexPosition(vertices, drawImage.dstX, drawImage.dstY, drawImage.dstW, drawImage.dstH);
+	}
+
+	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+	squareVertexPositionBuffer.itemSize = 2;
+	squareVertexPositionBuffer.numItems = vertices.length/squareVertexPositionBuffer.itemSize;
+}
+
+
+function initBuffers(gl, drawImages)
+{
+	var viewportW	= gl.viewportWidth;
+	var viewportH	= gl.viewportHeight;
+	var imageW	= 256;
+	var imageH	= 256;
+
+
+	var appendVertexPosition	= function(positions, x,y, width, height){
+		var pixelXToPosition	= function(x){
+			return (x - viewportW/2) / (viewportW/2);
+		};
+		var pixelYToPosition	= function(y){
+			return - (y - viewportH/2) / (viewportH/2);
+		};
+		var minX	= pixelXToPosition(x);
+		var maxX	= pixelXToPosition(x+width);
+		var minY	= pixelYToPosition(y);
+		var maxY	= pixelYToPosition(y+height);
+		positions.push(minX);	positions.push(minY);
+		positions.push(maxX);	positions.push(minY);
+		positions.push(maxX);	positions.push(maxY);
+		positions.push(minX);	positions.push(maxY);
+	};
+
+	var appendTextureCoord	= function(arr, x,y, width, height){
+		var pixelXToPosition	= function(x){
+			return x / imageW;
+		};
+		var pixelYToPosition	= function(y){
+			return y / imageH;
+		};
+		var minX	= pixelXToPosition(x);
+		var maxX	= pixelXToPosition(x+width);
+		var minY	= pixelYToPosition(y);
+		var maxY	= pixelYToPosition(y+height);
+		arr.push(minX);	arr.push(minY);
+		arr.push(maxX);	arr.push(minY);
+		arr.push(maxX);	arr.push(maxY);
+		arr.push(minX);	arr.push(maxY);
+	};
+
+if(false){
+	squareVertexPositionBuffer	= gl.createBuffer();
+	gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBuffer);
+
+	var vertices 	= [];
+	for( var i = 0; i < drawImages.length; i++){
+// dstX, dstY, dstW, dstH
+		var drawImage	= drawImages[i];
+		appendVertexPosition(vertices, drawImage.dstX, drawImage.dstY, drawImage.dstW, drawImage.dstH);
 	}
 
 	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
 	squareVertexPositionBuffer.itemSize = 2;
 	squareVertexPositionBuffer.numItems = vertices.length/squareVertexPositionBuffer.itemSize;
 
-	var nbSquare	= vertices.length/8;
-	console.log("nbsquare", nbSquare);
-
+console.log("drawImages.length", drawImages.length);
+}else{
+	initVertexPositionsBuffers(gl, drawImages);
+}
 	squareTextureCoordBuffer	= gl.createBuffer();
 	gl.bindBuffer(gl.ARRAY_BUFFER, squareTextureCoordBuffer);
 	// here to push the src vectors
 	var textureCoords = [];
 // srcx, srcy, srcW, srcH
-	for(var i=0; i < nbSquare; i++){
-		textureCoords.push(0.0);	textureCoords.push(0.0);
-		textureCoords.push(1.0);	textureCoords.push(0.0);
-		textureCoords.push(1.0);	textureCoords.push(1.0);
-		textureCoords.push(0.0);	textureCoords.push(1.0);
+	for(var i=0; i < drawImages.length; i++){
+		var drawImage	= drawImages[i];
+		appendTextureCoord(textureCoords, drawImage.srcX, drawImage.srcY, drawImage.srcW, drawImage.srcH)
         }
 	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoords), gl.STATIC_DRAW);
 	squareTextureCoordBuffer.itemSize = 2;
@@ -100,7 +168,7 @@ function initBuffers(gl, drawImages)
 	squareVertexIndexBuffer = gl.createBuffer();
 	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, squareVertexIndexBuffer);
 	var squareVertexIndices = [];
-	for(var i=0; i < nbSquare; i++) {
+	for(var i=0; i < drawImages.length; i++){
 		// face one
 		squareVertexIndices.push(i*4+0);	squareVertexIndices.push(i*4+1);	squareVertexIndices.push(i*4+2);
 		// face two
