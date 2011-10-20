@@ -1,12 +1,53 @@
 /** namespace */
 var CanvasGL	= CanvasGL	|| {};
 
+CanvasGL._vertexShaderText	= [
+	// attribute
+	"attribute vec2 aVertexPosition;",
+	"attribute vec2 aTextureCoord;",
+
+	// texture
+	"varying vec2 vTextureCoord;",
+
+	"void main(void){",
+		"gl_Position     = vec4(aVertexPosition.x, aVertexPosition.y, 0, 1.0);",
+		"vTextureCoord   = aTextureCoord;",
+	"}"
+].join("\n");
+
+CanvasGL._fragmentShaderText	= [
+	"#ifdef GL_ES",
+		"precision highp float;",
+	"#endif",
+
+	"varying vec2		vTextureCoord;",
+	"uniform sampler2D	uSampler;",
+
+	"void main(void) {",
+		"gl_FragColor    = texture2D(uSampler, vTextureCoord);",
+	"}"
+].join("\n");
+
+CanvasGL.initShaders	= function(gl)
+{
+	shaderProgram		= CanvasGL._buildShaderProgram(gl, "shader-vs", "shader-fs");
+	
+	// init shader variables
+	shaderProgram.vertexPositionAttribute	= gl.getAttribLocation(shaderProgram, "aVertexPosition");
+	gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
+
+	shaderProgram.textureCoordAttribute	= gl.getAttribLocation(shaderProgram, "aTextureCoord");
+	gl.enableVertexAttribArray(shaderProgram.textureCoordAttribute);
+
+	shaderProgram.samplerUniform		= gl.getUniformLocation(shaderProgram, "uSampler");
+}
+
 /**
  * get the text of a shader from Dom ID (up to the caller to compile it)
  *
  * @returns {String} the text of the shader
 */
-CanvasGL.getShaderFromDomId	= function(domId)
+CanvasGL._getShaderFromDomId	= function(domId)
 {
 	var element	= document.getElementById(domId);
 	var text	= "";
@@ -25,7 +66,7 @@ CanvasGL.getShaderFromDomId	= function(domId)
  * 
  * @returns the compiled shader
 */
-CanvasGL.compileShader	= function(gl, type, text)
+CanvasGL._compileShader	= function(gl, type, text)
 {
 	var type2gl	= {
 		"x-shader/x-fragment"	: gl.FRAGMENT_SHADER,
@@ -47,25 +88,15 @@ CanvasGL.compileShader	= function(gl, type, text)
 }
 
 /**
- * get and compile a shader
-*/
-CanvasGL.getAndCompileShader	= function(gl, type, domId)
-{
-	var text	= CanvasGL.getShaderFromDomId(domId);
-	var code	= CanvasGL.compileShader(gl, type, text);
-	return code;
-}
-
-/**
  * link shader program
  * 
  * @returns the shader program
 */
-CanvasGL.buildShaderProgram	= function(gl, vertexDomId, fragmentDomId)
+CanvasGL._buildShaderProgram	= function(gl, vertexDomId, fragmentDomId)
 {
 	// get vertexShader and fragmentShader
-	var vertexShader	= CanvasGL.getAndCompileShader(gl, "x-shader/x-vertex"	, vertexDomId);
-	var fragmentShader	= CanvasGL.getAndCompileShader(gl, "x-shader/x-fragment", fragmentDomId);
+	var vertexShader	= CanvasGL._compileShader(gl, "x-shader/x-vertex", CanvasGL._vertexShaderText);
+	var fragmentShader	= CanvasGL._compileShader(gl, "x-shader/x-fragment", CanvasGL._fragmentShaderText);
 	
 	// create and link the program
 	var program	= gl.createProgram();

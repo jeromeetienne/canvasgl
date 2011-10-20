@@ -1,9 +1,17 @@
 /**
+ * Create a context which is compatible with 2D context
 */
 CanvasGL.Context	= function(domElement)
 {
 	this._domElement	= domElement;
 	this._drawImages	= [];
+	
+// TODO here you do all the initialisation for webgl
+}
+
+CanvasGL.Context.prototype.glFlush	= function()
+{
+	// TODO here you render all this._drawImages	
 }
 
 CanvasGL.Context.prototype.drawImage	= function(imgElement)

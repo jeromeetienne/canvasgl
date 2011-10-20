@@ -8,20 +8,6 @@ var squareVertexPositionBuffer;
 var squareTextureCoordBuffer;
 var squareVertexIndexBuffer;
 
-function initShaders(gl)
-{
-	shaderProgram		= CanvasGL.buildShaderProgram(gl, "shader-vs", "shader-fs");
-	
-	// init shader variables
-	shaderProgram.vertexPositionAttribute	= gl.getAttribLocation(shaderProgram, "aVertexPosition");
-	gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
-
-	shaderProgram.textureCoordAttribute	= gl.getAttribLocation(shaderProgram, "aTextureCoord");
-	gl.enableVertexAttribArray(shaderProgram.textureCoordAttribute);
-
-	shaderProgram.samplerUniform		= gl.getUniformLocation(shaderProgram, "uSampler");
-}
-
 /**
  * So this will be done by CanvasGL canvas api
 */
@@ -30,7 +16,7 @@ function buildDrawImages()
 	var viewportW	= gl.viewportWidth;
 	var viewportH	= gl.viewportHeight;
 	var drawImages	= [];
-	for( var i = 0; i < 1000; i++){
+	for(var i = 0; i < 1000; i++){
 		var drawImage	= {
 			dstX	: Math.random()*(viewportW-64),
 			dstY	: Math.random()*(viewportH-64),
@@ -47,7 +33,6 @@ function buildDrawImages()
 	return drawImages;
 }
 
-
 function init()
 {
 	var canvas	= document.getElementById("canvas");
@@ -57,14 +42,14 @@ function init()
 	neheTexture	= CanvasGL.initTexture("images/nehe.gif");
 
 	// init shaders
-	initShaders(gl);
+	CanvasGL.initShaders(gl);
 
 	gl.clearColor(0.0, 0.0, 0.0, 1.0);
 	gl.enable(gl.DEPTH_TEST);
 
 	var drawImages	= buildDrawImages();
 	//console.log("drawImages", drawImages)
-	initBuffers(gl, drawImages);
+	CanvasGL.initBuffers(gl, drawImages);
 	
 	animate();
 }

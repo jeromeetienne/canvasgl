@@ -8,7 +8,6 @@ CanvasGL.enable	= function(domElement)
 {
 	domElement.$oldGetContext	= domElement.getContext
 	domElement.getContext		= CanvasGL.getContext
-	
 }
 
 /**
@@ -17,7 +16,7 @@ CanvasGL.enable	= function(domElement)
 CanvasGL.getContext	= function(contextId)
 {
 	var domElement	= this;
-	// if it isnt for CanvasGL, forward a normal canvas
+	// if it isnt for CanvasGL, forward to previous getContext function
 	if( contextId != 'canvasgl' )	return domElement.$oldGetContext.apply(domElement, arguments);
 
 	return new CanvasGL.Context(domElement);
