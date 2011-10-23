@@ -106,11 +106,11 @@ console.log("neheImage", neheImage.width)
 
 function animate(){
 	render();
-	stats.update();
+	//stats.update();
 	requestAnimFrame(animate);
 }
 
-var renderNSprites	= 1000;
+var renderNSprites	= 3000;
 var renderLastTime	= Date.now();
 
 function render()
@@ -119,16 +119,14 @@ function render()
 	ctx.update();
 	
 	var present	= Date.now();
-	var renderDelay	= present - renderLastTime;
+	var measuredTime= present - renderLastTime;
 	renderLastTime	= present;
 	
-	var spriteDelay	= renderDelay/renderNSprites;
-	var fps		= guiOptions.fps;
-	renderNSprites	= (1000/fps)/spriteDelay;
-	//console.log("renderNSprite", Math.floor(renderNSprites));
-	//console.log("renderDelay", renderDelay, spriteDelay, renderNSprites);
-	renderNSprites	= 10000;
-	document.getElementById("nSprites").innerHTML	= Math.floor(renderNSprites);
+	var allowedTime	= 1000/guiOptions.fps;
+	var factor	= measuredTime / allowedTime;
+	if( measuredTime > allowedTime )	renderNSprites	-= 100;
+	else if( measuredTime < allowedTime )	renderNSprites	+= 100;
+	//document.getElementById("nSprites").innerHTML	= Math.floor(renderNSprites);
 }
 
 
