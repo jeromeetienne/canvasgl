@@ -40,7 +40,7 @@ function init()
 	var canvas	= document.getElementById("canvas");
 	
 	CanvasGL.enable(canvas)
-	ctx		= canvas.getContext('canvasgl');	
+	ctx		= canvas.getContext('2d');	
 
 	// init the texture
 	neheImage	= new Image();
