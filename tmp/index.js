@@ -1,7 +1,6 @@
 var ctx;
 
 var neheTexture;
-var neheImage;
 
 // TODO all those should be in canvasgl-context
 var shaderProgram;
@@ -32,10 +31,7 @@ function buildDrawImages(viewportW, viewportH)
 			srcW	: 256,
 			srcH	: 256
 		};
-//		drawImages.push(drawImage);
-	ctx.drawImage(neheImage, drawImage.srcX, drawImage.srcY, drawImage.srcW, drawImage.srcH,
-		      drawImage.dstX, drawImage.dstY, drawImage.dstW, drawImage.dstH);
-
+		drawImages.push(drawImage);
 	};
 	return drawImages;
 }
@@ -48,11 +44,6 @@ function init()
 
 	// init the texture
 	neheTexture	= CanvasGL.initTexture(ctx._gl, "images/nehe.gif");
-
-	neheImage	= new Image();
-	neheImage.onload	= function(){
-	}
-	neheImage.src	= "images/nehe.gif";
 	
 	animate();
 }
@@ -63,15 +54,9 @@ function animate(){
 }
 
 function render(){
-
-if( false ){
 	var drawImages	= buildDrawImages(ctx._gl.viewportWidth, ctx._gl.viewportHeight);
-	ctx._render(drawImages);
-}else{
-	buildDrawImages(ctx._gl.viewportWidth, ctx._gl.viewportHeight);
-	ctx.glFlush();
-}
 
+	ctx._flush(drawImages);
 }
 
 
