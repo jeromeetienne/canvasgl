@@ -1,3 +1,6 @@
+/** namespace */
+var CanvasGL	= CanvasGL	|| {};
+
 CanvasGL.Context	= function(domElement)
 {
 	this._domElement	= domElement;
@@ -8,7 +11,7 @@ CanvasGL.Context	= function(domElement)
 	// init shaders
 	CanvasGL.initShaders(this._gl);
 
-	this._initBuffers();
+	this._buffers	= new CanvasGL.Context.Buffers(this._gl);
 }
 
 CanvasGL.Context.prototype._initGL	= function()
@@ -27,7 +30,7 @@ CanvasGL.Context.prototype._initGL	= function()
 	this._gl.enable(this._gl.DEPTH_TEST);
 }
 
-CanvasGL.Context.prototype.glFlush	= function()
+CanvasGL.Context.prototype.update	= function()
 {
 	this._render(this._drawImages);
 	this._drawImages	= [];	// reallocation ? any bench
@@ -90,146 +93,33 @@ CanvasGL.Context.prototype._bindImage	= function(image)
 	gl.bindTexture	(gl.TEXTURE_2D, null);
 }
 
-
-
 CanvasGL.Context.prototype._render	= function(drawImages)
 {
 	var gl	= this._gl;
 	
-	this._updateBuffers();
+	this._buffers.update(drawImages);
 
 	gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-	gl.bindBuffer(gl.ARRAY_BUFFER, this._bufVertexPosition);
-	gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, this._bufVertexPosition.itemSize, gl.FLOAT, false, 0, 0);
+	var buffer	= this._buffers.vertexPosition();
+	gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+	gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, buffer.itemSize, gl.FLOAT, false, 0, 0);
 
-	gl.bindBuffer(gl.ARRAY_BUFFER, this._bufTextureCoord);
-	gl.vertexAttribPointer(shaderProgram.textureCoordAttribute, this._bufTextureCoord.itemSize, gl.FLOAT, false, 0, 0);
+	var buffer	= this._buffers.textureCoord();
+	gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+	gl.vertexAttribPointer(shaderProgram.textureCoordAttribute, buffer.itemSize, gl.FLOAT, false, 0, 0);
 
+	var texture	= neheImage._canvasglTexture;
 	gl.activeTexture(gl.TEXTURE0);
-	gl.bindTexture(gl.TEXTURE_2D, neheImage._canvasglTexture);
+	gl.bindTexture(gl.TEXTURE_2D, texture);
 	gl.uniform1i(shaderProgram.samplerUniform, 0);
 
 	// TODO this should be triangle strip ? trigrou says no
 	// - so unclear at best. gl.TRIANGLES are simple. leave them for now
 	// drawElements got limitations from a size pov
-	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._bufVertexIndex);
-	gl.drawElements(gl.TRIANGLES, this._bufVertexIndex.numItems, gl.UNSIGNED_SHORT, 0);
+	var buffer	= this._buffers.vertexIndex();
+	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer);
+	gl.drawElements(gl.TRIANGLES, buffer.numItems, gl.UNSIGNED_SHORT, 0);
 	
 }
-
-
-//////////////////////////////////////////////////////////////////////////////////
-//		Buffers								//
-//////////////////////////////////////////////////////////////////////////////////
-
-CanvasGL.Context.prototype._initBuffers	= function()
-{
-	var gl			= this._gl;
-	this._bufVertexPosition	= gl.createBuffer();
-	this._bufTextureCoord	= gl.createBuffer();
-	this._bufVertexIndex	= gl.createBuffer();
-}
-
-CanvasGL.Context.prototype._updateBuffers	= function()
-{
-	this._updateVertexPositionsBuffers();
-	this._updateTextureCoordsBuffers()
-	this._updateVertexIndexBuffers()
-}
-
-CanvasGL.Context.prototype._updateVertexPositionsBuffers	= function()
-{
-	var gl		= this._gl;
-	var drawImages	= this._drawImages;
-	var viewportW	= gl.viewportWidth;
-	var viewportH	= gl.viewportHeight;
-
-	var appendVertexPosition	= function(positions, x,y, width, height){
-		var pixelXToPosition	= function(x){
-			return (x - viewportW/2) / (viewportW/2);
-		};
-		var pixelYToPosition	= function(y){
-			return - (y - viewportH/2) / (viewportH/2);
-		};
-		var minX	= pixelXToPosition(x);
-		var maxX	= pixelXToPosition(x+width);
-		var minY	= pixelYToPosition(y);
-		var maxY	= pixelYToPosition(y+height);
-		positions.push(minX);	positions.push(minY);
-		positions.push(maxX);	positions.push(minY);
-		positions.push(maxX);	positions.push(maxY);
-		positions.push(minX);	positions.push(maxY);
-	};
-
-	gl.bindBuffer(gl.ARRAY_BUFFER, this._bufVertexPosition);
-
-	var vertices 	= [];
-	for( var i = 0; i < drawImages.length; i++){
-// dstX, dstY, dstW, dstH
-		var drawImage	= drawImages[i];
-		appendVertexPosition(vertices, drawImage.dstX, drawImage.dstY, drawImage.dstW, drawImage.dstH);
-	}
-
-	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
-	this._bufVertexPosition.itemSize = 2;
-	this._bufVertexPosition.numItems = vertices.length/this._bufVertexPosition.itemSize;
-}
-
-
-CanvasGL.Context.prototype._updateTextureCoordsBuffers	= function()
-{
-	var gl		= this._gl;
-	var drawImages	= this._drawImages;
-	var imageW	= 256;
-	var imageH	= 256;
-
-	var appendTextureCoord	= function(arr, x,y, width, height){
-		var pixelXToPosition	= function(x){
-			return x / imageW;
-		};
-		var pixelYToPosition	= function(y){
-			return y / imageH;
-		};
-		var minX	= pixelXToPosition(x);
-		var maxX	= pixelXToPosition(x+width);
-		var minY	= pixelYToPosition(y);
-		var maxY	= pixelYToPosition(y+height);
-		arr.push(minX);	arr.push(minY);
-		arr.push(maxX);	arr.push(minY);
-		arr.push(maxX);	arr.push(maxY);
-		arr.push(minX);	arr.push(maxY);
-	};
-
-	gl.bindBuffer(gl.ARRAY_BUFFER, this._bufTextureCoord);
-	// here to push the src vectors
-	var textureCoords = [];
-// srcx, srcy, srcW, srcH
-	for(var i=0; i < drawImages.length; i++){
-		var drawImage	= drawImages[i];
-		appendTextureCoord(textureCoords, drawImage.srcX, drawImage.srcY, drawImage.srcW, drawImage.srcH)
-        }
-	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoords), gl.STATIC_DRAW);
-	this._bufTextureCoord.itemSize = 2;
-	this._bufTextureCoord.numItems = textureCoords.length/this._bufTextureCoord.itemSize;
-}
-
-CanvasGL.Context.prototype._updateVertexIndexBuffers	= function()
-{
-	var gl		= this._gl;
-	var drawImages	= this._drawImages;
-	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._bufVertexIndex);
-	var squareVertexIndices = [];
-	for(var i=0; i < drawImages.length; i++){
-		// face one
-		squareVertexIndices.push(i*4+0);	squareVertexIndices.push(i*4+1);	squareVertexIndices.push(i*4+2);
-		// face two
-		squareVertexIndices.push(i*4+0);	squareVertexIndices.push(i*4+2);	squareVertexIndices.push(i*4+3);
-	}
-	
-	gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(squareVertexIndices), gl.STATIC_DRAW);
-	this._bufVertexIndex.itemSize = 1;
-	this._bufVertexIndex.numItems = squareVertexIndices.length/this._bufVertexIndex.itemSize;
-}
-
