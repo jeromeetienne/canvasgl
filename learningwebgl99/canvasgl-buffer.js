@@ -1,7 +1,7 @@
 /** namespace */
 var CanvasGL	= CanvasGL	|| {};
 
-CanvasGL._initVertexPositionsBuffers	= function(gl, drawImages)
+CanvasGL._updateVertexPositionsBuffers	= function(gl, drawImages)
 {
 	var viewportW	= gl.viewportWidth;
 	var viewportH	= gl.viewportHeight;
@@ -23,7 +23,6 @@ CanvasGL._initVertexPositionsBuffers	= function(gl, drawImages)
 		positions.push(minX);	positions.push(maxY);
 	};
 
-	squareVertexPositionBuffer	= gl.createBuffer();
 	gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBuffer);
 
 	var vertices 	= [];
@@ -38,7 +37,7 @@ CanvasGL._initVertexPositionsBuffers	= function(gl, drawImages)
 	squareVertexPositionBuffer.numItems = vertices.length/squareVertexPositionBuffer.itemSize;
 }
 
-CanvasGL._initTextureCoordsBuffers	= function(gl, drawImages)
+CanvasGL._updateTextureCoordsBuffers	= function(gl, drawImages)
 {
 	var imageW	= 256;
 	var imageH	= 256;
@@ -60,7 +59,6 @@ CanvasGL._initTextureCoordsBuffers	= function(gl, drawImages)
 		arr.push(minX);	arr.push(maxY);
 	};
 
-	squareTextureCoordBuffer	= gl.createBuffer();
 	gl.bindBuffer(gl.ARRAY_BUFFER, squareTextureCoordBuffer);
 	// here to push the src vectors
 	var textureCoords = [];
@@ -74,9 +72,8 @@ CanvasGL._initTextureCoordsBuffers	= function(gl, drawImages)
 	squareTextureCoordBuffer.numItems = textureCoords.length/squareTextureCoordBuffer.itemSize;
 }
 
-CanvasGL._initVertexIndexBuffers	= function(gl, drawImages)
+CanvasGL._updateVertexIndexBuffers	= function(gl, drawImages)
 {
-	squareVertexIndexBuffer = gl.createBuffer();
 	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, squareVertexIndexBuffer);
 	var squareVertexIndices = [];
 	for(var i=0; i < drawImages.length; i++){
@@ -91,9 +88,15 @@ CanvasGL._initVertexIndexBuffers	= function(gl, drawImages)
 	squareVertexIndexBuffer.numItems = squareVertexIndices.length/squareVertexIndexBuffer.itemSize;
 }
 
-CanvasGL.initBuffers	= function(gl, drawImages)
+CanvasGL.initBuffers	= function(gl)
 {
-	CanvasGL._initVertexPositionsBuffers(gl, drawImages);
-	CanvasGL._initTextureCoordsBuffers(gl, drawImages)
-	CanvasGL._initVertexIndexBuffers(gl, drawImages)
+	squareVertexPositionBuffer	= gl.createBuffer();
+	squareTextureCoordBuffer	= gl.createBuffer();
+	squareVertexIndexBuffer = gl.createBuffer();
+}
+CanvasGL.updateBuffers	= function(gl, drawImages)
+{
+	CanvasGL._updateVertexPositionsBuffers(gl, drawImages);
+	CanvasGL._updateTextureCoordsBuffers(gl, drawImages)
+	CanvasGL._updateVertexIndexBuffers(gl, drawImages)
 };

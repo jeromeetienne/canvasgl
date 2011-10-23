@@ -16,10 +16,15 @@ function buildDrawImages()
 	var viewportW	= gl.viewportWidth;
 	var viewportH	= gl.viewportHeight;
 	var drawImages	= [];
+
+	var present	= Date.now()/1000;
+	var offsetX	= 30*Math.cos(present*2);
+	var offsetY	= 50*Math.sin(present*3);
+
 	for(var i = 0; i < 1000; i++){
 		var drawImage	= {
-			dstX	: Math.random()*(viewportW-64),
-			dstY	: Math.random()*(viewportH-64),
+			dstX	: offsetX + Math.random()*(viewportW-64),
+			dstY	: offsetY + Math.random()*(viewportH-64),
 			dstW	: 64,
 			dstH	: 64,
 
@@ -36,6 +41,7 @@ function buildDrawImages()
 function init()
 {
 	var canvas	= document.getElementById("canvas");
+	
 	gl		= CanvasGL.initGL(canvas);
 
 	// init the texture
@@ -47,19 +53,21 @@ function init()
 	gl.clearColor(0.0, 0.0, 0.0, 1.0);
 	gl.enable(gl.DEPTH_TEST);
 
-	var drawImages	= buildDrawImages();
-	//console.log("drawImages", drawImages)
-	CanvasGL.initBuffers(gl, drawImages);
+	CanvasGL.initBuffers(gl);
 	
 	animate();
 }
 
 function animate(){
 	requestAnimFrame(animate);
-	render(gl);
+	render();
 }
 
-function render(gl) {
+function render(){
+	var drawImages	= buildDrawImages();
+
+	CanvasGL.updateBuffers(gl, drawImages);
+
 	gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
