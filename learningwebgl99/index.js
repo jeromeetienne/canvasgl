@@ -5,9 +5,6 @@ var neheImage;
 
 // TODO all those should be in canvasgl-context
 var shaderProgram;
-var squareVertexPositionBuffer;
-var squareTextureCoordBuffer;
-var squareVertexIndexBuffer;
 
 /**
  * So this will be done by CanvasGL canvas api
@@ -22,8 +19,8 @@ function buildDrawImages(viewportW, viewportH)
 
 	for(var i = 0; i < 1000; i++){
 		var drawImage	= {
-			dstX	: offsetX + Math.random()*(viewportW-64),
-			dstY	: offsetY + Math.random()*(viewportH-64),
+			dstX	: offsetX + 0*Math.random()*(viewportW-64),
+			dstY	: offsetY + 0*Math.random()*(viewportH-64),
 			dstW	: 64,
 			dstH	: 64,
 
@@ -47,9 +44,6 @@ function init()
 	// init the texture
 	neheImage	= new Image();
 	neheImage.onload	= function(){
-		console.log("nehaimage", neheImage)
-		console.dir(neheImage)
-		
 		ctx._bindImage(neheImage)
 
 		animate();
