@@ -22,7 +22,7 @@ function buildGui(options, callback)
 	var gui = new DAT.GUI({
 		height	: 4 * 32 - 1
 	});
-console.log("kkk", options)
+
 	gui.add(options, 'integerCoord')
 		.onFinishChange(function(){callback(options)}).onChange(function(){callback(options)});
 	gui.add(options, 'fps').min(15).max(60)
@@ -112,6 +112,7 @@ function animate(){
 
 var renderNSprites	= 3000;
 var renderLastTime	= Date.now();
+var renderLastStats	= Date.now();
 
 function render()
 {
@@ -126,7 +127,11 @@ function render()
 	var factor	= measuredTime / allowedTime;
 	if( measuredTime > allowedTime )	renderNSprites	-= 100;
 	else if( measuredTime < allowedTime )	renderNSprites	+= 100;
-	//document.getElementById("nSprites").innerHTML	= Math.floor(renderNSprites);
+	
+	if( renderLastStats + 500 < present ){	
+		document.getElementById("nSprites").innerHTML	= Math.floor(renderNSprites);
+		renderLastStats	= present;
+	}
 }
 
 
