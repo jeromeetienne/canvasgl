@@ -29,8 +29,11 @@ function buildDrawImages(viewportW, viewportH)
 			srcW	: 256,
 			srcH	: 256
 		};
-		ctx.drawImage(neheImage, drawImage.srcX, drawImage.srcY, drawImage.srcW, drawImage.srcH,
-			      drawImage.dstX, drawImage.dstY, drawImage.dstW, drawImage.dstH);
+		ctx.drawImage(
+			neheImage,
+			drawImage.srcX, drawImage.srcY, drawImage.srcW, drawImage.srcH,
+			drawImage.dstX, drawImage.dstY, drawImage.dstW, drawImage.dstH
+		);
 	};
 	return drawImages;
 }
@@ -43,12 +46,24 @@ function init()
 	ctx		= canvas.getContext('2d');	
 
 	// init the texture
+/**
+ * - how to abstract this ?
+ * - input variable is Image
+ * - image._canvasglTexture	= gl.createTexture()
+ * - init the texture when the image is loaded
+ * - 2 cases, already loaded ? not yet loaded
+ * - how to detect each case ?
+ *   - likely available on the internet
+ *   - neheImage.width isnt 0 if loaded ?
+*/
 	neheImage	= new Image();
-	neheImage.onload	= function(){
+	neheImage.onload= function(){
 		ctx._bindImage(neheImage)
-
+console.log("neheImage", neheImage.width)
+console.dir(neheImage)
 		animate();
 	}
+console.log("neheImage", neheImage.width)
 	neheImage.src	= "images/nehe.gif";
 	
 }

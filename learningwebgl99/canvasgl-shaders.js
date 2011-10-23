@@ -11,6 +11,10 @@ CanvasGL.Context.Shaders	= function(gl)
 	
 	// init shader variables
 	var program	= this._program;
+	
+// TODO those variables names are too big
+// - they are use in canvasgl-context._render()
+	
 	program.vertexPositionAttribute	= gl.getAttribLocation(program, "aVertexPosition");
 	gl.enableVertexAttribArray(program.vertexPositionAttribute);
 
@@ -59,9 +63,9 @@ CanvasGL.Context.Shaders.prototype._buildShaderProgram	= function()
 {
 	var gl			= this._gl;
 	// get vertexShader and fragmentShader
-	var vertexShader	= this._compileShader("x-shader/x-vertex", CanvasGL.Context.Shaders._vertexShaderText);
-	var fragmentShader	= this._compileShader("x-shader/x-fragment", CanvasGL.Context.Shaders._fragmentShaderText);
-	
+	var vertexShader	= this._compileShader("x-shader/x-vertex"	, CanvasGL.Context.Shaders._vertexShaderText);
+	var fragmentShader	= this._compileShader("x-shader/x-fragment"	, CanvasGL.Context.Shaders._fragmentShaderText);
+
 	// create and link the program
 	var program	= gl.createProgram();
 	gl.attachShader(program, vertexShader);
@@ -72,9 +76,11 @@ CanvasGL.Context.Shaders.prototype._buildShaderProgram	= function()
 		alert("Could not initialise shaders");
 		console.assert(false);
 	}
+
 	// use this program
 	// TODO is this needed here ??? 
 	gl.useProgram(program);
+	
 	// return the shader program
 	return program;
 }
