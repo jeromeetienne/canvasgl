@@ -9,7 +9,7 @@ CanvasGL.Context	= function(domElement)
 	this._initGL();
 
 	// init shaders
-	CanvasGL.initShaders(this._gl);
+	this._shaders	= new CanvasGL.Context.Shaders(this._gl);
 
 	this._buffers	= new CanvasGL.Context.Buffers(this._gl);
 }
@@ -95,8 +95,9 @@ CanvasGL.Context.prototype._bindImage	= function(image)
 
 CanvasGL.Context.prototype._render	= function(drawImages)
 {
-	var gl	= this._gl;
-	
+	var gl		= this._gl;
+	var program	= this._shaders.program();
+
 	this._buffers.update(drawImages);
 
 	gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
@@ -104,16 +105,16 @@ CanvasGL.Context.prototype._render	= function(drawImages)
 
 	var buffer	= this._buffers.vertexPosition();
 	gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-	gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, buffer.itemSize, gl.FLOAT, false, 0, 0);
+	gl.vertexAttribPointer(program.vertexPositionAttribute, buffer.itemSize, gl.FLOAT, false, 0, 0);
 
 	var buffer	= this._buffers.textureCoord();
 	gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-	gl.vertexAttribPointer(shaderProgram.textureCoordAttribute, buffer.itemSize, gl.FLOAT, false, 0, 0);
+	gl.vertexAttribPointer(program.textureCoordAttribute, buffer.itemSize, gl.FLOAT, false, 0, 0);
 
 	var texture	= neheImage._canvasglTexture;
 	gl.activeTexture(gl.TEXTURE0);
 	gl.bindTexture(gl.TEXTURE_2D, texture);
-	gl.uniform1i(shaderProgram.samplerUniform, 0);
+	gl.uniform1i(program.samplerUniform, 0);
 
 	// TODO this should be triangle strip ? trigrou says no
 	// - so unclear at best. gl.TRIANGLES are simple. leave them for now
@@ -121,5 +122,4 @@ CanvasGL.Context.prototype._render	= function(drawImages)
 	var buffer	= this._buffers.vertexIndex();
 	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer);
 	gl.drawElements(gl.TRIANGLES, buffer.numItems, gl.UNSIGNED_SHORT, 0);
-	
 }
