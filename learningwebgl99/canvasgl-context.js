@@ -3,7 +3,7 @@ CanvasGL.Context	= function(domElement)
 	this._domElement	= domElement;
 	this._drawImages	= [];
 
-	this._gl		= CanvasGL.initGL(canvas);
+	this._initGL();
 
 
 	// init shaders
@@ -16,12 +16,23 @@ CanvasGL.Context	= function(domElement)
 
 }
 
+CanvasGL.Context.prototype._initGL	= function()
+{
+	try {
+		// get the context
+		this._gl		= this._domElement.getContext("experimental-webgl");
+		// set the context dimensions
+		this._gl.viewportWidth	= this._domElement.width;
+		this._gl.viewportHeight	= this._domElement.height;
+	}catch (e){}
+	// check for errors
+	if (!this._gl)	alert("Could not initialise WebGL, sorry :-(");
+}
+
 CanvasGL.Context.prototype.glFlush	= function()
 {
-	// TODO here you render all this._drawImages	
-
 	this._render(this._drawImages);
-	this._drawImages	= [];
+	this._drawImages	= [];	// reallocation ? any bench
 }
 
 CanvasGL.Context.prototype.drawImage	= function(imgElement)
@@ -69,6 +80,24 @@ CanvasGL.Context.prototype.drawImage	= function(imgElement)
 	});
 }
 
+
+/**
+ * 
+*/
+CanvasGL.Context.prototype._bindImage	= function(image)
+{
+	var gl		= this._gl;
+	var texture	= gl.createTexture();
+	image._canvasglTexture	= texture;
+	gl.bindTexture	(gl.TEXTURE_2D, texture);
+	gl.texImage2D	(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+	gl.bindTexture	(gl.TEXTURE_2D, null);
+}
+
+
+
 CanvasGL.Context.prototype._render	= function(drawImages)
 {
 	var gl	= this._gl;
@@ -85,7 +114,7 @@ CanvasGL.Context.prototype._render	= function(drawImages)
 	gl.vertexAttribPointer(shaderProgram.textureCoordAttribute, squareTextureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
 	gl.activeTexture(gl.TEXTURE0);
-	gl.bindTexture(gl.TEXTURE_2D, neheTexture);
+	gl.bindTexture(gl.TEXTURE_2D, neheImage._canvasglTexture);
 	gl.uniform1i(shaderProgram.samplerUniform, 0);
 
 	// TODO this should be triangle strip ? trigrou says no

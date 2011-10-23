@@ -92,7 +92,7 @@ CanvasGL.initBuffers	= function(gl)
 {
 	squareVertexPositionBuffer	= gl.createBuffer();
 	squareTextureCoordBuffer	= gl.createBuffer();
-	squareVertexIndexBuffer = gl.createBuffer();
+	squareVertexIndexBuffer 	= gl.createBuffer();
 }
 CanvasGL.updateBuffers	= function(gl, drawImages)
 {
