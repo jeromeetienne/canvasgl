@@ -2,27 +2,54 @@ var ctx;
 
 //var neheTexture;
 var neheImage;
+var stats;
 
-// TODO all those should be in canvasgl-context
-var shaderProgram;
+// maybe replace that by window... or something
+var guiOptions	= {
+	integerCoord	: true,
+	fps		: 30,
+	spriteSizeValue	: 64,
+	spriteSizeRange	: 0
+};
+
+
+/**
+ * Build ui with Data.GUI
+*/
+function buildGui(options, callback)
+{
+	callback	= callback	|| function(opts){};
+	var gui = new DAT.GUI({
+		height	: 4 * 32 - 1
+	});
+console.log("kkk", options)
+	gui.add(options, 'integerCoord')
+		.onFinishChange(function(){callback(options)}).onChange(function(){callback(options)});
+	gui.add(options, 'fps').min(15).max(60)
+		.onFinishChange(function(){callback(options)}).onChange(function(){callback(options)});
+	gui.add(options, 'spriteSizeValue').min(16).max(128)
+		.onFinishChange(function(){callback(options)}).onChange(function(){callback(options)});
+	gui.add(options, 'spriteSizeRange').min(0).max(128)
+		.onFinishChange(function(){callback(options)}).onChange(function(){callback(options)});
+}
+
 
 /**
  * So this will be done by CanvasGL canvas api
 */
-function buildDrawImages(viewportW, viewportH)
+function buildDrawImages(viewportW, viewportH, nSprites)
 {
-	var drawImages	= [];
-
 	var present	= Date.now()/1000;
 	var offsetX	= 100+30*Math.cos(present*2);
 	var offsetY	= 100+50*Math.sin(present*3);
-
-	for(var i = 0; i < 2; i++){
+	
+	for(var i = 0; i < nSprites; i++){
+		var sizeW	= guiOptions.spriteSizeValue + guiOptions.spriteSizeRange*(Math.random()-0.5);
 		var drawImage	= {
-			dstX	: offsetX + 0*Math.random()*(viewportW-64),
-			dstY	: offsetY + 0*Math.random()*(viewportH-64),
-			dstW	: 64*3,
-			dstH	: 64*3,
+			dstX	: offsetX + 1*Math.random()*(viewportW-64),
+			dstY	: offsetY + 1*Math.random()*(viewportH-64),
+			dstW	: sizeW,
+			dstH	: sizeW,
 
 			srcX	: 0,
 			srcY	: 0,
@@ -34,8 +61,7 @@ function buildDrawImages(viewportW, viewportH)
 			drawImage.srcX, drawImage.srcY, drawImage.srcW, drawImage.srcH,
 			drawImage.dstX, drawImage.dstY, drawImage.dstW, drawImage.dstH
 		);
-	};
-	return drawImages;
+	}
 }
 
 function init()
@@ -65,18 +91,44 @@ console.dir(neheImage)
 	}
 console.log("neheImage", neheImage.width)
 	neheImage.src	= "images/nehe.gif";
-	
+
+	// build the GUI 
+	buildGui(guiOptions);
+
+	// stats
+	stats = new Stats();
+	stats.domElement.style.position = 'absolute';
+	stats.domElement.style.bottom = '0px';
+	stats.domElement.style.zIndex = 100;
+	document.body.appendChild( stats.domElement );
+
 }
 
 function animate(){
-	requestAnimFrame(animate);
 	render();
+	stats.update();
+	requestAnimFrame(animate);
 }
+
+var renderNSprites	= 1000;
+var renderLastTime	= Date.now();
 
 function render()
 {
-	buildDrawImages(ctx._gl.viewportWidth, ctx._gl.viewportHeight);
+	buildDrawImages(ctx._gl.viewportWidth, ctx._gl.viewportHeight, renderNSprites);
 	ctx.update();
+	
+	var present	= Date.now();
+	var renderDelay	= present - renderLastTime;
+	renderLastTime	= present;
+	
+	var spriteDelay	= renderDelay/renderNSprites;
+	var fps		= guiOptions.fps;
+	renderNSprites	= (1000/fps)/spriteDelay;
+	//console.log("renderNSprite", Math.floor(renderNSprites));
+	//console.log("renderDelay", renderDelay, spriteDelay, renderNSprites);
+	renderNSprites	= 10000;
+	document.getElementById("nSprites").innerHTML	= Math.floor(renderNSprites);
 }
 
 

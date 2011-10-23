@@ -7,10 +7,7 @@ CanvasGL.Context	= function(domElement)
 	this._drawImages	= [];
 
 	this._initGL();
-
-	// init shaders
 	this._shaders	= new CanvasGL.Context.Shaders(this._gl);
-
 	this._buffers	= new CanvasGL.Context.Buffers(this._gl);
 }
 
