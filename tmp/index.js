@@ -19,7 +19,7 @@ function buildDrawImages(viewportW, viewportH)
 	var offsetX	= 30*Math.cos(present*2);
 	var offsetY	= 50*Math.sin(present*3);
 
-	for(var i = 0; i < 10000; i++){
+	for(var i = 0; i < 20000; i++){
 		var drawImage	= {
 			dstX	: offsetX + Math.random()*(viewportW-64),
 			dstY	: offsetY + Math.random()*(viewportH-64),

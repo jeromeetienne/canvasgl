@@ -29,7 +29,7 @@ CanvasGL.Context.prototype._initGL	= function()
 
 CanvasGL.Context.prototype.update	= function()
 {
-	this._render(this._drawImages);
+	this._render();
 	this._drawImages	= [];	// reallocation ? any bench
 }
 
@@ -80,25 +80,53 @@ CanvasGL.Context.prototype.drawImage	= function(imgElement)
 
 CanvasGL.Context.prototype._bindImage	= function(image)
 {
+	console.assert( !image._canvasglTexture );
 	var gl		= this._gl;
 	var texture	= gl.createTexture();
 	image._canvasglTexture	= texture;
-	gl.bindTexture	(gl.TEXTURE_2D, texture);
-	gl.texImage2D	(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
-	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-	gl.bindTexture	(gl.TEXTURE_2D, null);
+	var initTexture	= function(){
+		console.log("init texture for ", image.src)
+		gl.bindTexture	(gl.TEXTURE_2D, texture);
+		gl.texImage2D	(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+		gl.bindTexture	(gl.TEXTURE_2D, null);		
+	};
+	// image.width === 0 when it isnt yet loaded
+	var isLoaded	= image.width ? true : false;
+	if( isLoaded )	initTexture();
+	else		image.onload	= function(){ initTexture(); }
 }
 
-CanvasGL.Context.prototype._render	= function(drawImages)
+CanvasGL.Context.prototype._render	= function()
 {
 	var gl		= this._gl;
-	var program	= this._shaders.program();
+	var drawImages	= this._drawImages;
 
-	this._buffers.update(drawImages);
-
+	// clear the screen
 	gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+	
+	// detect batch using the same image as source
+	for(var indexFirst = 0; indexFirst < drawImages.length;){
+		var indexLast	= indexFirst;
+		for(var i = indexFirst; i < drawImages.length; i++){
+			if( drawImages[i].img !== drawImages[indexFirst].img )	break;
+			indexLast	= i;
+		}
+		this._renderImage(drawImages, indexFirst, indexLast);
+		indexFirst	= indexLast+1;
+	}
+}
+
+CanvasGL.Context.prototype._renderImage	= function(drawImages, indexFirst, indexLast)
+{
+	var image	= drawImages[indexFirst].img;
+	var program	= this._shaders.program();
+	var gl		= this._gl;
+
+	// build the buffer
+	this._buffers.update(drawImages, indexFirst, indexLast);
 
 	var buffer	= this._buffers.vertexPosition();
 	gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
@@ -108,7 +136,8 @@ CanvasGL.Context.prototype._render	= function(drawImages)
 	gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
 	gl.vertexAttribPointer(program.textureCoordAttribute, buffer.itemSize, gl.FLOAT, false, 0, 0);
 
-	var texture	= neheImage._canvasglTexture;
+	if( !image._canvasglTexture )	this._bindImage(image);
+	var texture	= image._canvasglTexture;
 	gl.activeTexture(gl.TEXTURE0);
 	gl.bindTexture(gl.TEXTURE_2D, texture);
 	gl.uniform1i(program.samplerUniform, 0);

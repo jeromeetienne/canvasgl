@@ -14,14 +14,14 @@ CanvasGL.Context.Buffers.prototype.vertexPosition	= function(){ return this._buf
 CanvasGL.Context.Buffers.prototype.textureCoord		= function(){ return this._bufTextureCoord;	}
 CanvasGL.Context.Buffers.prototype.vertexIndex		= function(){ return this._bufVertexIndex;	}
 
-CanvasGL.Context.Buffers.prototype.update	= function(drawImages)
+CanvasGL.Context.Buffers.prototype.update	= function(drawImages, indexFirst, indexLast)
 {
-	this._updateVertexPositionsBuffers(drawImages);
-	this._updateTextureCoordsBuffers(drawImages)
-	this._updateVertexIndexBuffers(drawImages)
+	this._updateVertexPositionsBuffers(drawImages, indexFirst, indexLast);
+	this._updateTextureCoordsBuffers(drawImages, indexFirst, indexLast);
+	this._updateVertexIndexBuffers(drawImages, indexFirst, indexLast);
 }
 
-CanvasGL.Context.Buffers.prototype._updateVertexPositionsBuffers	= function(drawImages)
+CanvasGL.Context.Buffers.prototype._updateVertexPositionsBuffers	= function(drawImages, indexFirst, indexLast)
 {
 	var gl		= this._gl;
 	var viewportW	= gl.viewportWidth;
@@ -45,7 +45,7 @@ CanvasGL.Context.Buffers.prototype._updateVertexPositionsBuffers	= function(draw
 	};
 
 	var values 	= [];
-	for( var i = 0; i < drawImages.length; i++){
+	for( var i = indexFirst; i <= indexLast; i++){
 // dstX, dstY, dstW, dstH
 		var drawImage	= drawImages[i];
 		appendVertexPosition(values, drawImage.dstX, drawImage.dstY, drawImage.dstW, drawImage.dstH);
@@ -59,11 +59,12 @@ CanvasGL.Context.Buffers.prototype._updateVertexPositionsBuffers	= function(draw
 }
 
 
-CanvasGL.Context.Buffers.prototype._updateTextureCoordsBuffers	= function(drawImages)
+CanvasGL.Context.Buffers.prototype._updateTextureCoordsBuffers	= function(drawImages, indexFirst, indexLast)
 {
 	var gl		= this._gl;
-	var imageW	= 256;
-	var imageH	= 256;
+	var image	= drawImages[indexFirst].img;
+	var imageW	= image.width;
+	var imageH	= image.height;
 
 	var appendTextureCoord	= function(arr, x,y, width, height){
 		var pixelXToPosition	= function(x){
@@ -84,7 +85,7 @@ CanvasGL.Context.Buffers.prototype._updateTextureCoordsBuffers	= function(drawIm
 
 	// here to push the texture coordinates
 	var values	= [];
-	for(var i=0; i < drawImages.length; i++){
+	for( var i = indexFirst; i <= indexLast; i++){
 		var drawImage	= drawImages[i];
 		appendTextureCoord(values, drawImage.srcX, drawImage.srcY, drawImage.srcW, drawImage.srcH)
         }
@@ -96,12 +97,12 @@ CanvasGL.Context.Buffers.prototype._updateTextureCoordsBuffers	= function(drawIm
 	buffer.numItems = values.length/buffer.itemSize;
 }
 
-CanvasGL.Context.Buffers.prototype._updateVertexIndexBuffers	= function(drawImages)
+CanvasGL.Context.Buffers.prototype._updateVertexIndexBuffers	= function(drawImages, indexFirst, indexLast)
 {
 	var gl		= this._gl;
 
 	var values	= [];
-	for(var i=0; i < drawImages.length; i++){
+	for(var i=0; i < (indexLast - indexFirst + 1); i++){
 		// face one
 		values.push(i*4+0);	values.push(i*4+1);	values.push(i*4+2);
 		// face two
