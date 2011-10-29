@@ -2,12 +2,21 @@
 var CanvasGL	= CanvasGL	|| {};
 
 /**
- * CanvasGL.enable(canvasElement) to make a canvas as possible CanvasGL
+ * CanvasGL.bind(canvasElement) to make a canvas as possible CanvasGL
 */
-CanvasGL.enable	= function(domElement)
+CanvasGL.bind	= function(domElement)
 {
 	domElement.$oldGetContext	= domElement.getContext
 	domElement.getContext		= CanvasGL.getContext
+}
+
+/**
+ * CanvasGL.unbind(canvasElement)
+*/
+CanvasGL.unbind	= function(domElement)
+{
+	domElement.getContext		= domElement.$oldGetContext;
+	delete domElement.$oldGetContext;
 }
 
 /**

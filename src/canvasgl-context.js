@@ -62,7 +62,7 @@ CanvasGL.Context.prototype.drawImage	= function(imgElement)
 		dstY	= arguments[6];
 		dstW	= arguments[7];
 		dstH	= arguments[8];
-	}else console.assert(false);
+	}else console.assert(false, "wrong number of parameters in .drawImage()");
 
 	// queue this in the drawImages array
 	this._drawImages.push({
@@ -85,7 +85,7 @@ CanvasGL.Context.prototype._bindImage	= function(image)
 	var texture	= gl.createTexture();
 	image._canvasglTexture	= texture;
 	var initTexture	= function(){
-		console.log("init texture for ", image.src)
+		console.log("init texture for ", image)
 		gl.bindTexture	(gl.TEXTURE_2D, texture);
 		gl.texImage2D	(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
@@ -110,7 +110,7 @@ CanvasGL.Context.prototype._render	= function()
 
 	// clear the screen
 	gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
-	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);	// TODO do i need DEPTH ?
 	
 	// detect batch using the same image as source
 	for(var indexFirst = 0; indexFirst < drawImages.length;){
@@ -143,6 +143,7 @@ CanvasGL.Context.prototype._renderImage	= function(drawImages, indexFirst, index
 
 	if( !image._canvasglTexture )	this._bindImage(image);
 	var texture	= image._canvasglTexture;
+console.log("image", image, texture)
 	gl.activeTexture(gl.TEXTURE0);
 	gl.bindTexture(gl.TEXTURE_2D, texture);
 	gl.uniform1i(program.samplerUniform, 0);
@@ -154,3 +155,54 @@ CanvasGL.Context.prototype._renderImage	= function(drawImages, indexFirst, index
 	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer);
 	gl.drawElements(gl.TRIANGLES, buffer.numItems, gl.UNSIGNED_SHORT, 0);
 }
+
+//////////////////////////////////////////////////////////////////////////////////
+//		ProxyCtx							//
+//////////////////////////////////////////////////////////////////////////////////
+
+CanvasGL.Context.prototype._proxyctxCreateIfNeeded	= function()
+{
+	if( this._proxyctx )	return this._proxyctx;
+	this._proxyCanvas	= document.createElement('canvas');
+	this._proxyctx		= this._proxyCanvas.getContext('2d');
+	return this._proxyctx;
+}
+
+CanvasGL.Context.prototype._proxyctxFlush	= function()
+{
+	var canvas	= this._proxyCanvas;
+	window.open(canvas.toDataURL());
+	this.drawImage(canvas, 0, 0);
+	this._proxyCanvas	= null;
+	this._proxyctx		= null;
+}
+
+CanvasGL.Context.proxyGetter	= function(property){
+	CanvasGL.Context.prototype.__defineGetter__(property, function(){
+		this._proxyctxCreateIfNeeded();
+		console.log("Getter", property, "returns", this._proxyctx[property]);
+		return this._proxyctx[property];
+	});
+}
+
+CanvasGL.Context.proxySetter	= function(property){
+	CanvasGL.Context.prototype.__defineSetter__(property, function(value){
+		this._proxyctxCreateIfNeeded();
+		console.log("Setter", property, "from", this._proxyctx[property], "to", value);
+		return this._proxyctx[property]	= value;
+	});
+}
+
+CanvasGL.Context.proxyDrawCall	= function(property){
+	CanvasGL.Context.prototype[property]	= function(){
+		this._proxyctxCreateIfNeeded();
+		console.log("proxyDrawCall", property, arguments)
+		this._proxyctx[property].apply(this._proxyctx, arguments);
+		this._proxyctxFlush();
+	};
+}
+
+CanvasGL.Context.proxyGetter("fillStyle");
+CanvasGL.Context.proxySetter("fillStyle");
+CanvasGL.Context.proxyDrawCall("fillRect");
+

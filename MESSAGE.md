@@ -13,15 +13,41 @@ performance are peak numbers.
 
 performance depending on the size of destination
 
+performance depending on the amount of source image.
+
 performance may degrade depending on the usage pattern tho.
 
-monster case: copy of many small Image elements.
+worst case: one copy of many Image elements.
+best case: many copy of one Image elements
 
-TODO just describe how it is done.
+# how much work to include it ?
+
+canvasgl aims to be a canvas 2D dropin replacement.
+
+it will works as a dropin
+
+but one may need some more porting to get top performance tho.
+
+
 
 # description
 
+TODO just describe how it is done.
 
+
+first, lets look at a little rule of thumb for webgl.
+it is called "reduce the number of draw call to be faster".
+It means that the less webgl draw call you do, the faster you are.
+
+how canvasgl process the ```ctx.drawImage``` you do.
+
+It queues all you calls.
+
+they are drawn only when you do ```ctx.update()```.
+
+TODO API: to bind this custom ```ctx.update``` to a clear rectangle for the whole
+viewport. Assuming this ```cls``` is done at the begining of the frame ?
+Goal: ease inclusion.
 
 # efficiency tips
 
@@ -36,7 +62,12 @@ The number of source Image element is a key factor in performance.
 
 The number of textures that you can use during a given webgl draw call, is limited.
 
-limited to 8. true ?
+limited to 8. true ? i think 8 is the minimum required but may go higher.
+gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS)
+or MAX_COMBINED_TEXTURE_IMAGE_UNITS
+
+my macbook got 16, others got 32. it depends on the graphic card.
+
 
 if you need more texture, you need to do more webgl draw calls.
 
@@ -48,3 +79,5 @@ Nice stuff: in my understanding, current best practices suggests to use
 the amount of source Image.
 
 TODO what about the order
+
+What if you get 8 images or less ?

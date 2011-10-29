@@ -51,6 +51,8 @@ CanvasGL.Context.Buffers.prototype._updateVertexPositionsBuffers	= function(draw
 		appendVertexPosition(values, drawImage.dstX, drawImage.dstY, drawImage.dstW, drawImage.dstH);
 	}
 
+//console.log("buffer vectexPosition", values);
+
 	var buffer	= this._bufVertexPosition;
 	gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
 	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(values), gl.STATIC_DRAW);
@@ -90,6 +92,8 @@ CanvasGL.Context.Buffers.prototype._updateTextureCoordsBuffers	= function(drawIm
 		appendTextureCoord(values, drawImage.srcX, drawImage.srcY, drawImage.srcW, drawImage.srcH)
         }
 
+//console.log("buffer textureCorrd", values);
+
 	var buffer	= this._bufTextureCoord;
 	gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
 	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(values), gl.STATIC_DRAW);
@@ -100,7 +104,7 @@ CanvasGL.Context.Buffers.prototype._updateTextureCoordsBuffers	= function(drawIm
 CanvasGL.Context.Buffers.prototype._updateVertexIndexBuffers	= function(drawImages, indexFirst, indexLast)
 {
 	var gl		= this._gl;
-
+// TODO this buffer always contains the same value... no need to recompute them every time
 	var values	= [];
 	for(var i=0; i < (indexLast - indexFirst + 1); i++){
 		// face one
@@ -109,6 +113,8 @@ CanvasGL.Context.Buffers.prototype._updateVertexIndexBuffers	= function(drawImag
 		values.push(i*4+0);	values.push(i*4+2);	values.push(i*4+3);
 	}
 	
+//console.log("buffer vertexIndex", values);
+
 	var buffer	= this._bufVertexIndex;
 	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer);
 	gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(values), gl.STATIC_DRAW);

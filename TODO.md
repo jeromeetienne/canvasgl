@@ -1,15 +1,13 @@
-# how to design the bench
+Do the canvas 2D emulation
 
-* be flexible
-* support touch
-* not specific to canvasgl, it is about canvas and bitmap
-  * aka game
-* use dat.gui for ui
-* see how to run jsgamebench
+this is what is missing compare to webgl-2d
 
-## options
-* size of the sprite
-* amount of distinct sprite
-  * in sprite sheet ? as individual
-* randomness
-* integer pixel for coordinate: bool
+canvasgl is already faster
+
+----------------------------
+* performance
+* benchmark
+* compatibility canvas 2D API
+* publication
+
+* does it fix the problem

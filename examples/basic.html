@@ -1,0 +1,49 @@
+<html>
+
+<head>
+	<title>canvas on webgl</title>
+	<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+
+	<script src="vendor/Stats.js">			</script>
+	<script src="vendor/Detector.js">		</script>
+	<script src="vendor/dat-gui/build/DAT.GUI.js">	</script>
+	<script src="vendor/requestAnimFrame.js">	</script>
+
+	<script src="vendor/gowiththeflow.js/gowiththeflow.js">	</script>
+
+	<script src="vendor/webgl-2d/webgl-2d.js">	</script>
+
+	<script src="../src/canvasgl-core.js">		</script>
+	<script src="../src/canvasgl-context.js">	</script>
+	<script src="../src/canvasgl-buffers.js">	</script>
+	<script src="../src/canvasgl-shaders.js">	</script>
+
+</head>
+
+
+<body>
+	<canvas id="canvas" width="450" height="300"></canvas>
+<script>
+	var usedTech	= "rawCanvas2d";
+	var usedTech	= "CanvasGL";
+	var canvas	= document.getElementById("canvas");
+	if( usedTech == "CanvasGL" ){
+		CanvasGL.bind(canvas)
+		ctx	= canvas.getContext('2d');	
+	}else if( usedTech == "rawCanvas2d"){
+		ctx	= canvas.getContext('2d');	
+	}else if( usedTech == "WebGL2D" ){
+		WebGL2D.enable(canvas);
+		ctx	= canvas.getContext('webgl-2d');	
+	}else	console.assert(false);
+	
+	console.log("main fillStyle", ctx.fillStyle)
+	ctx.fillStyle = "rgb(200,0,0)"; 
+	console.log("main fillStyle", ctx.fillStyle)
+        ctx.fillRect(10, 10, 55, 50);
+	if( ctx instanceof CanvasGL.Context )	ctx.update();
+
+</script>
+</body>
+
+</html>

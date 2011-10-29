@@ -81,7 +81,7 @@ function init()
 	
 
 	if( usedTech == "CanvasGL" ){
-		CanvasGL.enable(canvas)
+		CanvasGL.bind(canvas)
 		ctx	= canvas.getContext('2d');	
 	}else if( usedTech == "rawCanvas2d"){
 		ctx	= canvas.getContext('2d');	
