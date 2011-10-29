@@ -163,8 +163,11 @@ console.log("image", image, texture)
 CanvasGL.Context.prototype._proxyctxCreateIfNeeded	= function()
 {
 	if( this._proxyctx )	return this._proxyctx;
-	this._proxyCanvas	= document.createElement('canvas');
-	this._proxyctx		= this._proxyCanvas.getContext('2d');
+	var canvas	= this._proxyCanvas	= document.createElement('canvas');
+	var ctx 	= this._proxyctx	= this._proxyCanvas.getContext('2d');
+	canvas.width	= this._gl.viewportWidth;
+	canvas.height	= this._gl.viewportHeight;
+console.log("canvas", canvas)
 	return this._proxyctx;
 }
 

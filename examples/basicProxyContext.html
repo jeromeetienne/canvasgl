@@ -22,14 +22,14 @@
 
 
 <body>
-	<canvas id="canvas" width="450" height="300"></canvas>
+	<canvas id="canvas" width="256" height="256"></canvas>
 <script>
 	var usedTech	= "rawCanvas2d";
 	var usedTech	= "CanvasGL";
 	var canvas	= document.getElementById("canvas");
 	if( usedTech == "CanvasGL" ){
 		CanvasGL.bind(canvas)
-		ctx	= canvas.getContext('2d');	
+		ctx	= canvas.getContext('2d');
 	}else if( usedTech == "rawCanvas2d"){
 		ctx	= canvas.getContext('2d');	
 	}else if( usedTech == "WebGL2D" ){
@@ -37,10 +37,14 @@
 		ctx	= canvas.getContext('webgl-2d');	
 	}else	console.assert(false);
 	
+
 	console.log("main fillStyle", ctx.fillStyle)
-	ctx.fillStyle = "rgb(200,0,0)"; 
+	ctx.fillStyle = "rgb(0, 200,0)"; 
 	console.log("main fillStyle", ctx.fillStyle)
-        ctx.fillRect(10, 10, 55, 50);
+        //ctx.fillRect(10, 10, 55, 50);
+	ctx.fillStyle = "rgb(200, 200,0)"; 
+	console.log("main fillStyle", ctx.fillStyle)
+        ctx.fillRect(30, 10, 55, 50);
 	if( ctx instanceof CanvasGL.Context )	ctx.update();
 
 </script>
