@@ -13,18 +13,25 @@ CanvasGL.Context	= function(domElement)
 
 CanvasGL.Context.prototype._initGL	= function()
 {
+	var gl;
 	try {
 		// get the context
-		this._gl		= this._domElement.getContext("experimental-webgl");
+		gl			= this._domElement.getContext("experimental-webgl");
 		// set the context dimensions
-		this._gl.viewportWidth	= this._domElement.width;
-		this._gl.viewportHeight	= this._domElement.height;
+		gl.viewportWidth	= this._domElement.width;
+		gl.viewportHeight	= this._domElement.height;
 	}catch (e){}
 	// check for errors
-	if (!this._gl)	alert("Could not initialise WebGL, sorry :-(");
+	if( !gl )	alert("Could not initialise WebGL, sorry :-(");
 
-	this._gl.clearColor(0.0, 0.0, 0.0, 1.0);
-	this._gl.enable(this._gl.DEPTH_TEST);
+	this._gl	= gl;
+
+	gl.clearColor(0.0, 0.0, 0.0, 1.0);
+	gl.enable(gl.DEPTH_TEST);
+
+	// clear the screen
+	gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
+	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);	// TODO do i need DEPTH ?
 }
 
 CanvasGL.Context.prototype.update	= function()
@@ -108,10 +115,6 @@ CanvasGL.Context.prototype._render	= function()
 	var gl		= this._gl;
 	var drawImages	= this._drawImages;
 
-	// clear the screen
-	gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
-	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);	// TODO do i need DEPTH ?
-	
 	// detect batch using the same image as source
 	for(var indexFirst = 0; indexFirst < drawImages.length;){
 		var indexLast	= indexFirst;
@@ -173,10 +176,14 @@ console.log("canvas", canvas)
 CanvasGL.Context.prototype._proxyctxFlush	= function()
 {
 	var canvas	= this._proxyCanvas;
-	//window.open(canvas.toDataURL());
-var element	= document.createElement("img");
-element.src	= canvas.toDataURL();
-document.body.appendChild(element)
+if( false ){
+	window.open(canvas.toDataURL());
+}
+if( false ){
+	var element	= document.createElement("img");
+	element.src	= canvas.toDataURL();
+	document.body.appendChild(element)
+}
 	this.drawImage(canvas, 0, 0);
 	this._proxyCanvas	= null;
 	this._proxyctx		= null;
@@ -207,7 +214,28 @@ CanvasGL.Context.proxyDrawCall	= function(property){
 	};
 }
 
-CanvasGL.Context.proxyGetter("fillStyle");
-CanvasGL.Context.proxySetter("fillStyle");
-CanvasGL.Context.proxyDrawCall("fillRect");
+CanvasGL.Context.proxyCall	= function(property){
+	CanvasGL.Context.prototype[property]	= function(){
+		this._proxyctxCreateIfNeeded();
+		console.log("proxyCall", property, arguments)
+		this._proxyctx[property].apply(this._proxyctx, arguments);
+	};
+}
+
+// define all the properties to proxy
+CanvasGL.Context._proxyGetterSetters	= ["fillStyle"];
+CanvasGL.Context._proxyCalls		= ["beginPath", "closePath", "moveTo", "lineTo"];
+CanvasGL.Context._proxyDrawCalls	= ["fillRect", "clearRect", "strokeRect", "stroke", "fill"];
+
+// actually bind those calls into CanvasGL.Context.prototype
+CanvasGL.Context._proxyDrawCalls.forEach(function(property){
+	CanvasGL.Context.proxyDrawCall(property);
+})
+CanvasGL.Context._proxyCalls.forEach(function(property){
+	CanvasGL.Context.proxyCall(property);
+})
+CanvasGL.Context._proxyGetterSetters.forEach(function(property){
+	CanvasGL.Context.proxyGetter(property);
+	CanvasGL.Context.proxySetter(property);
+})
 

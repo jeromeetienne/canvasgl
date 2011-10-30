@@ -42,7 +42,7 @@ CanvasGL.Context.Buffers.prototype._updateVertexPositionsBuffers	= function(draw
 		positions.push(maxX);	positions.push(minY);
 		positions.push(maxX);	positions.push(maxY);
 		positions.push(minX);	positions.push(maxY);
-	};
+	}
 
 	var values 	= [];
 	for( var i = indexFirst; i <= indexLast; i++){

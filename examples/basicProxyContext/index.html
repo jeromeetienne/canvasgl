@@ -6,7 +6,7 @@
 
 	<style>
 	body	{
-		background-color	: red;
+		background-color	: blue;
 	}
 	</style>
 
@@ -51,19 +51,26 @@
 	}
 
 	function animate() {
-		requestAnimationFrame( animate );
+		requestAnimFrame( animate );
 		render();
 	}
-				
+	
+
 	function render(){
+		var present	= Date.now() / 1000;
+		var x		= (50*(present/1))%128
+
+ctx.beginPath();  
+ctx.moveTo(x+75,50);  
+ctx.lineTo(100,75);  
+ctx.lineTo(100,25);  
+ctx.fill();
 		ctx.fillStyle = "rgb(0, 200,0)"; 
-		ctx.fillRect(10, 10, 55, 50);
+		ctx.strokeRect(x, 10, 55, 50);
 		ctx.fillStyle = "rgb(200, 200,0)";
 		ctx.fillRect(30, 30, 55, 50);
 		if( ctx instanceof CanvasGL.Context )	ctx.update();
 	}
-	init();
-	render();
 
 </script>
 </body>
