@@ -30,7 +30,7 @@ CanvasGL.Context.prototype._initGL	= function()
 CanvasGL.Context.prototype.update	= function()
 {
 	this._render();
-	this._drawImages	= [];	// reallocation ? any bench
+	this._drawImages	= new Array();	// reallocation ? any bench
 }
 
 CanvasGL.Context.prototype.drawImage	= function(imgElement)
@@ -129,7 +129,6 @@ CanvasGL.Context.prototype._renderImage	= function(drawImages, indexFirst, index
 	var image	= drawImages[indexFirst].img;
 	var program	= this._shaders.program();
 	var gl		= this._gl;
-
 	// build the buffer
 	bufferUpdate && this._buffers.update(drawImages, indexFirst, indexLast);
 
@@ -174,7 +173,10 @@ console.log("canvas", canvas)
 CanvasGL.Context.prototype._proxyctxFlush	= function()
 {
 	var canvas	= this._proxyCanvas;
-	window.open(canvas.toDataURL());
+	//window.open(canvas.toDataURL());
+var element	= document.createElement("img");
+element.src	= canvas.toDataURL();
+document.body.appendChild(element)
 	this.drawImage(canvas, 0, 0);
 	this._proxyCanvas	= null;
 	this._proxyctx		= null;

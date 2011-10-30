@@ -104,10 +104,10 @@ function init()
 
 	// init images
 	neheImage	= new Image();
-	neheImage.src	= "images/nehe.gif";
+	neheImage.src	= "../images/nehe.gif";
 
 	spriteImage	= new Image();
-	spriteImage.src	= "images/sprite4.png";
+	spriteImage.src	= "../images/sprite4.png";
 
 	animate();
 }
@@ -143,7 +143,7 @@ function animate()
 }
 
 var renderNSprites	= {
-	"CanvasGL"	: 15000,
+	"CanvasGL"	: 5000,
 	"rawCanvas2d"	: 1500,
 	"WebGL2D"	: 500
 }[usedTech];
@@ -167,10 +167,10 @@ if( true ){
 	else if( measuredTime < allowedTime )	renderNSprites	+= 10;
 }else{
 	var factor	= allowedTime / measuredTime;
-	var range	= 0.01;
+	var range	= 0.1;
 	factor		= Math.max(factor, 1.0-range );
 	factor		= Math.min(factor, 1.0+range );
-	//factor		= Math.pow(factor, 0.25);
+	factor		= Math.pow(factor, 2);
 	renderNSprites	= renderNSprites * factor;
 }
 
