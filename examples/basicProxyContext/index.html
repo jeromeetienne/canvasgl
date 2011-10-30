@@ -23,6 +23,7 @@
 
 	<script src="../../src/canvasgl-core.js">	</script>
 	<script src="../../src/canvasgl-context.js">	</script>
+	<script src="../../src/canvasgl-proxyCtx.js">	</script>
 	<script src="../../src/canvasgl-buffers.js">	</script>
 	<script src="../../src/canvasgl-shaders.js">	</script>
 
@@ -31,48 +32,54 @@
 
 <body onload="init();">
 	<canvas id="canvas" width="256" height="256"></canvas>
-<script>
-	var usedTech	= "rawCanvas2d";
-	var usedTech	= "CanvasGL";
-	var canvas	= document.getElementById("canvas");
-	var ctx;
+	<script>
+		var usedTech	= "rawCanvas2d";
+		var usedTech	= "CanvasGL";
+		var canvas	= document.getElementById("canvas");
+		var ctx;
+		
+		function init(){
+			if( usedTech == "CanvasGL" ){
+				CanvasGL.bind(canvas)
+				ctx	= canvas.getContext('2d');
+			}else if( usedTech == "rawCanvas2d"){
+				ctx	= canvas.getContext('2d');	
+			}else if( usedTech == "WebGL2D" ){
+				WebGL2D.enable(canvas);
+				ctx	= canvas.getContext('webgl-2d');	
+			}else	console.assert(false);
+			animate();
+		}
 	
-	function init(){
-		if( usedTech == "CanvasGL" ){
-			CanvasGL.bind(canvas)
-			ctx	= canvas.getContext('2d');
-		}else if( usedTech == "rawCanvas2d"){
-			ctx	= canvas.getContext('2d');	
-		}else if( usedTech == "WebGL2D" ){
-			WebGL2D.enable(canvas);
-			ctx	= canvas.getContext('webgl-2d');	
-		}else	console.assert(false);
-		animate();
-	}
-
-	function animate() {
-		requestAnimFrame( animate );
-		render();
-	}
+		function animate() {
+			requestAnimFrame( animate );
+			render();
+		}
+		
 	
-
-	function render(){
-		var present	= Date.now() / 1000;
-		var x		= (50*(present/1))%128
-
-ctx.beginPath();  
-ctx.moveTo(x+75,50);  
-ctx.lineTo(100,75);  
-ctx.lineTo(100,25);  
-ctx.fill();
-		ctx.fillStyle = "rgb(0, 200,0)"; 
-		ctx.strokeRect(x, 10, 55, 50);
-		ctx.fillStyle = "rgb(200, 200,0)";
-		ctx.fillRect(30, 30, 55, 50);
-		if( ctx instanceof CanvasGL.Context )	ctx.update();
-	}
-
-</script>
+		function render(){
+			var present	= Date.now() / 1000;
+			var x		= (50*(present/1))%128
+	
+			if( false ){
+				ctx.beginPath();  
+				ctx.moveTo(x+75,50);  
+				ctx.lineTo(100,75);  
+				ctx.lineTo(100,25);  
+				ctx.fill();			
+			}
+	
+			if( true ){			
+				ctx.fillStyle = "rgb(0, 200,0)"; 
+				ctx.strokeRect(x, 10, 55, 50);
+				ctx.fillStyle = "rgb(200, 200,0)";
+				ctx.fillRect(30, 30, 55, 50);
+			}
+			
+			if( ctx instanceof CanvasGL.Context )	ctx.update();
+		}
+	
+	</script>
 </body>
 
 </html>

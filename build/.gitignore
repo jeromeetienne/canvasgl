@@ -1,0 +1,2 @@
+# by default, dont include the build in .git
+*.js

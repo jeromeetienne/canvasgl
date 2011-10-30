@@ -1,8 +1,22 @@
-Do the canvas 2D emulation
+ProxyContext:
+- memoryleak ?
+- apparently the canvas arent freeed...
+  - normal or not ?
+- issue with transparent
+  - is the transaparent issue in drawImage
+  - or in the canvas drawing
+  - how can i know ?
 
-this is what is missing compare to webgl-2d
+DrawImage:
+- new drawimage are drawn BELOW old ones
+- issue with transaparent
+- how to fix it ?
+  - issue with blending ? understand blending
+  - reverse sort to draw inverse order
 
-canvasgl is already faster
+DrawImage: better multi image
+- implement single call for multiple images
+- possible from 8 to 32 textures, so up to 32 simulatenous images in a single calls
 
 ----------------------------
 * performance
