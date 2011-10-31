@@ -42,6 +42,21 @@
 		var canvas, ctx;
 
 		var neheImage, spriteImage;
+
+		// TODO this should be a THREEx
+		function systemString(){
+			var userAgent	= "UserAgent : " + navigator.userAgent;
+			var hasWebGL	= ( function () { try { return !! window.WebGLRenderingContext && !! document.createElement( 'canvas' ).getContext( 'experimental-webgl' ); } catch( e ) { return false; } } )();
+			var glAgent;
+			if( hasWebGL ){
+				var gl	= document.createElement( 'canvas' ).getContext( 'experimental-webgl' );
+				glAgent	= 'WebGL Vendor: ' + gl.getParameter( gl.VENDOR )
+						+ " - WebGL Renderer: " + gl.getParameter( gl.RENDERER );
+			}else{
+				glAgent	= "no WebGL available";
+			}
+			return userAgent + " - " + glAgent;
+		}
 		
 		function init(){
 			// init images
@@ -50,10 +65,8 @@
 			spriteImage	= new Image();
 			spriteImage.src	= "../images/sprite4.png";
 
-			console.log("Run on userAgent :", navigator.userAgent);
-			// TODO display the graphic card too 
-			// https://github.com/mrdoob/three.js/blob/master/src/renderers/WebGLRenderer.js#L139
-			
+			console.log(systemString());
+
 			var flow	= Flow();
 			var backends	= ['rawCanvas2d', 'CanvasGL', 'WebGL2D'];
 			//var backends	= ['CanvasGL'];
