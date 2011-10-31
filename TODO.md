@@ -8,9 +8,9 @@ ProxyContext:
   - how can i know ?
 
 DrawImage:
-- new drawimage are drawn BELOW old ones
 - issue with transaparent
-- how to fix it ?
+- FIXED new drawimage are drawn BELOW old ones
+  - how to fix it ?
   - issue with blending ? understand blending
   - reverse sort to draw inverse order
 

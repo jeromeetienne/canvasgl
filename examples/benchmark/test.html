@@ -50,9 +50,13 @@
 			spriteImage	= new Image();
 			spriteImage.src	= "../images/sprite4.png";
 
+			console.log("Run on userAgent :", navigator.userAgent);
+			// TODO display the graphic card too 
+			// https://github.com/mrdoob/three.js/blob/master/src/renderers/WebGLRenderer.js#L139
+			
 			var flow	= Flow();
 			var backends	= ['rawCanvas2d', 'CanvasGL', 'WebGL2D'];
-			var backends	= ['CanvasGL'];
+			//var backends	= ['CanvasGL'];
 			backends.forEach(function(backend){
 				flow.seq(function(next){
 					initBench(backend, next);

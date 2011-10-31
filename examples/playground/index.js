@@ -73,6 +73,7 @@ function buildDrawImages2(){
 	ctx.drawImage(spriteImage, 0,0);
 	ctx.drawImage(neheImage, 50, 50);
 	ctx.drawImage(neheImage, 100, 100);
+	ctx.drawImage(spriteImage, 150, 150);
 }
 
 function init()
