@@ -92,7 +92,7 @@ CanvasGL.Context.prototype._bindImage	= function(image)
 	var texture	= gl.createTexture();
 	image._canvasglTexture	= texture;
 	var initTexture	= function(){
-		console.log("init texture for ", image)
+		//console.log("init texture for ", image)
 		gl.bindTexture	(gl.TEXTURE_2D, texture);
 		gl.texImage2D	(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
@@ -145,7 +145,7 @@ CanvasGL.Context.prototype._renderImage	= function(drawImages, indexFirst, index
 
 	if( !image._canvasglTexture )	this._bindImage(image);
 	var texture	= image._canvasglTexture;
-console.log("image", image, texture)
+//console.log("image", image, texture)
 	gl.activeTexture(gl.TEXTURE0);
 	gl.bindTexture(gl.TEXTURE_2D, texture);
 	gl.uniform1i(program.samplerUniform, 0);

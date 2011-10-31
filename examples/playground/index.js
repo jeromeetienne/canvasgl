@@ -58,7 +58,7 @@ function buildDrawImages(viewportW, viewportH, nSprites)
 
 			srcX	: 0,
 			srcY	: 0,
-			srcW	: 256,
+			srcW	: 256,	// TODO make that dynamic
 			srcH	: 256
 		};
 		ctx.drawImage(
@@ -153,8 +153,8 @@ var renderLastStats	= Date.now();
 function render()
 {
 	//buildDrawImages(ctx._gl.viewportWidth, ctx._gl.viewportHeight, renderNSprites);
-	buildDrawImages(512,384, renderNSprites);
-	//buildDrawImages2();
+	//buildDrawImages(512,384, renderNSprites);
+	buildDrawImages2();
 	if( ctx instanceof CanvasGL.Context )	ctx.update();
 
 	var present	= Date.now();
