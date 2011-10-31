@@ -29,6 +29,10 @@ CanvasGL.Context.prototype._initGL	= function()
 	gl.clearColor(0.0, 0.0, 0.0, 1.0);
 	gl.enable(gl.DEPTH_TEST);
 
+	gl.depthFunc( gl.LEQUAL );
+// TODO good stuff on init here
+// https://github.com/mrdoob/three.js/blob/master/src/renderers/WebGLRenderer.js#L159
+
 	// clear the screen
 	gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);	// TODO do i need DEPTH ?
