@@ -30,7 +30,7 @@ CanvasGL.Context.prototype._initGL	= function()
 	gl.enable(gl.DEPTH_TEST);
 
 	// 
-	gl.depthFunc( gl.LEQUAL );
+	// gl.depthFunc( gl.LEQUAL );
 // TODO good stuff on init here
 // https://github.com/mrdoob/three.js/blob/master/src/renderers/WebGLRenderer.js#L159
 
@@ -110,6 +110,14 @@ CanvasGL.Context.prototype._bindImage	= function(image)
 	else		image.onload	= function(){ initTexture(); }
 }
 
+CanvasGL.Context.prototype._unbindImage	= function(image)
+{
+	var gl		= this._gl;
+	if( !image._canvasglTexture )	return;
+	gl.deleteTexture(image._canvasglTexture);
+	delete image._canvasglTexture;
+}
+
 CanvasGL.Context.prototype._isBoundImage	= function(image)
 {
 	return image._canvasglTexture ? true : false;
@@ -161,4 +169,6 @@ CanvasGL.Context.prototype._renderImage	= function(drawImages, indexFirst, index
 	var buffer	= this._buffers.vertexIndex();
 	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer);
 	gl.drawElements(gl.TRIANGLES, buffer.numItems, gl.UNSIGNED_SHORT, 0);
+
+//this._unbindImage(image);
 }

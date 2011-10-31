@@ -12,7 +12,7 @@ CanvasGL.Context.prototype._proxyctxCreateIfNeeded	= function()
 	var ctx 	= this._proxyctx	= this._proxyCanvas.getContext('2d');
 	canvas.width	= this._gl.viewportWidth;
 	canvas.height	= this._gl.viewportHeight;
-console.log("canvas", canvas)
+//console.log("canvas", canvas)
 	return this._proxyctx;
 }
 
@@ -36,7 +36,7 @@ if( false ){
 CanvasGL.Context.proxyGetter	= function(property){
 	CanvasGL.Context.prototype.__defineGetter__(property, function(){
 		this._proxyctxCreateIfNeeded();
-		console.log("Getter", property, "returns", this._proxyctx[property]);
+		//console.log("Getter", property, "returns", this._proxyctx[property]);
 		return this._proxyctx[property];
 	});
 }
@@ -44,7 +44,7 @@ CanvasGL.Context.proxyGetter	= function(property){
 CanvasGL.Context.proxySetter	= function(property){
 	CanvasGL.Context.prototype.__defineSetter__(property, function(value){
 		this._proxyctxCreateIfNeeded();
-		console.log("Setter", property, "from", this._proxyctx[property], "to", value);
+		//console.log("Setter", property, "from", this._proxyctx[property], "to", value);
 		return this._proxyctx[property]	= value;
 	});
 }
@@ -52,7 +52,7 @@ CanvasGL.Context.proxySetter	= function(property){
 CanvasGL.Context.proxyCall	= function(property, withFlush){
 	CanvasGL.Context.prototype[property]	= function(){
 		this._proxyctxCreateIfNeeded();
-		console.log("proxyDrawCall", property, arguments)
+		//console.log("proxyDrawCall", property, arguments)
 		this._proxyctx[property].apply(this._proxyctx, arguments);
 		if( withFlush )	this._proxyctxFlush();
 	};
