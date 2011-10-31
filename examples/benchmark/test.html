@@ -50,19 +50,21 @@
 			spriteImage	= new Image();
 			spriteImage.src	= "../images/sprite4.png";
 
-			Flow().seq(function(next){
-				initBench("rawCanvas2d", next);
-			}).seq(function(next){
-				initBench("CanvasGL", next);
-			}).seq(function(next){
-				initBench("WebGL2D", next);
-			}).seq(function(next){
+			var flow	= Flow();
+			var backends	= ['rawCanvas2d', 'CanvasGL', 'WebGL2D'];
+			var backends	= ['CanvasGL'];
+			backends.forEach(function(backend){
+				flow.seq(function(next){
+					initBench(backend, next);
+				});
+			})
+			flow.seq(function(next){
 				console.log("ALL OVER");
 			});
 		}
-		function initBench(usedTech, callback){
+		function initBench(backend, callback){
 			var suite	= new Benchmark.Suite;
-			var nIterations	= 10;
+			var nIterations	= 1;
 			// add tests
 			suite.add('render 10time same image with 10 update', function() {
 				for(var j = 0; j < nIterations; j++ ){
@@ -93,17 +95,17 @@
 			})
 			.on('start', function(){
 				console.log("*************************************");
-				console.log(usedTech);
+				console.log(backend);
 				console.log("*************************************");
 
-				canvas	= document.getElementById("canvas-"+usedTech);
+				canvas	= document.getElementById("canvas-"+backend);
 				// init ctx
-				if( usedTech == "CanvasGL" ){
+				if( backend == "CanvasGL" ){
 					CanvasGL.bind(canvas)
 					ctx	= canvas.getContext('2d');
-				}else if( usedTech == "rawCanvas2d"){
+				}else if( backend == "rawCanvas2d"){
 					ctx	= canvas.getContext('2d');	
-				}else if( usedTech == "WebGL2D" ){
+				}else if( backend == "WebGL2D" ){
 					WebGL2D.enable(canvas);
 					ctx	= canvas.getContext('webgl-2d');	
 				}else	console.assert(false);
@@ -114,7 +116,7 @@
 				var name	= bench.name;
 				var nbDrawImages= Math.round(nIterations * 10 * opsPerSec);
 				var padNumber	= function(x, n){ return String("      "+x).slice(-n); };
-				console.log(padNumber(nbDrawImages, 6), "ctx.drawImage() per Sec", ":", usedTech, ": ", name)
+				console.log(padNumber(nbDrawImages, 6), "ctx.drawImage() per Sec", ":", backend, ": ", name)
 				//console.log(String(bench)); console.dir(bench);
 			})
 			.on('complete', function() {
