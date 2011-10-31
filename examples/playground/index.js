@@ -144,7 +144,7 @@ function animate()
 }
 
 var renderNSprites	= {
-	"CanvasGL"	: 15000,
+	"CanvasGL"	: 5000,
 	"rawCanvas2d"	: 1500,
 	"WebGL2D"	: 500
 }[usedTech];
@@ -154,8 +154,8 @@ var renderLastStats	= Date.now();
 function render()
 {
 	//buildDrawImages(ctx._gl.viewportWidth, ctx._gl.viewportHeight, renderNSprites);
-	//buildDrawImages(512,384, renderNSprites);
-	buildDrawImages2();
+	buildDrawImages(512,384, renderNSprites);
+	//buildDrawImages2();
 	if( ctx instanceof CanvasGL.Context )	ctx.update();
 
 	var present	= Date.now();
