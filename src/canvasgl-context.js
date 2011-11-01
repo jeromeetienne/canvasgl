@@ -1,8 +1,10 @@
 /** namespace */
 var CanvasGL	= CanvasGL	|| {};
 
-CanvasGL.Context	= function(domElement)
+CanvasGL.Context	= function(domElement, opts)
 {
+	opts			= opts || {};
+	this._glFinishOnUpdate	= opts.glFinishOnUpdate	|| false; 
 	this._domElement	= domElement;
 	this._drawImages	= [];
 
@@ -16,7 +18,11 @@ CanvasGL.Context.prototype._initGL	= function()
 	var gl;
 	try {
 		// get the context
-		gl			= this._domElement.getContext("experimental-webgl");
+		if( typeof NoWebGL != 'undefined' ){
+			gl	= NoWebGL.getContext();
+		}else{
+			gl	= this._domElement.getContext("experimental-webgl");
+		}
 		// set the context dimensions
 		gl.viewportWidth	= this._domElement.width;
 		gl.viewportHeight	= this._domElement.height;
@@ -27,12 +33,18 @@ CanvasGL.Context.prototype._initGL	= function()
 	this._gl	= gl;
 
 	gl.clearColor(0.0, 0.0, 0.0, 1.0);
-	gl.enable(gl.DEPTH_TEST);
 
-	// 
-	// gl.depthFunc( gl.LEQUAL );
+	gl.enable(gl.DEPTH_TEST);
+	// gl.LESS is much faster. less stressing on fragment shader i guess
+	gl.depthFunc( gl.LEQUAL );
 // TODO good stuff on init here
 // https://github.com/mrdoob/three.js/blob/master/src/renderers/WebGLRenderer.js#L159
+
+	gl.enable( gl.BLEND );
+	gl.blendEquationSeparate( gl.FUNC_ADD, gl.FUNC_ADD );
+	gl.blendFuncSeparate( gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA );
+
+	//gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
 	// clear the screen
 	gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
@@ -145,6 +157,7 @@ CanvasGL.Context.prototype._renderImage	= function(drawImages, indexFirst, index
 	var image	= drawImages[indexFirst].img;
 	var program	= this._shaders.program();
 	var gl		= this._gl;
+
 	// build the buffer
 	bufferUpdate && this._buffers.update(drawImages, indexFirst, indexLast);
 
@@ -158,7 +171,6 @@ CanvasGL.Context.prototype._renderImage	= function(drawImages, indexFirst, index
 
 	if( !image._canvasglTexture )	this._bindImage(image);
 	var texture	= image._canvasglTexture;
-//console.log("image", image, texture)
 	gl.activeTexture(gl.TEXTURE0);
 	gl.bindTexture(gl.TEXTURE_2D, texture);
 	gl.uniform1i(program.samplerUniform, 0);
@@ -170,5 +182,6 @@ CanvasGL.Context.prototype._renderImage	= function(drawImages, indexFirst, index
 	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer);
 	gl.drawElements(gl.TRIANGLES, buffer.numItems, gl.UNSIGNED_SHORT, 0);
 
-//this._unbindImage(image);
+	// honor this._glFinishOnUpdate
+	this._glFinishOnUpdate && gl.finish();
 }

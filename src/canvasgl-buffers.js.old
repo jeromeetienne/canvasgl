@@ -1,0 +1,131 @@
+/** namespace */
+var CanvasGL		= CanvasGL		|| {};
+CanvasGL.Context	= CanvasGL.Context	|| {};
+
+CanvasGL.Context.Buffers	= function(gl)
+{
+	this._gl		= gl;
+	this._bufVertexPosition	= gl.createBuffer();
+	this._bufTextureCoord	= gl.createBuffer();
+	this._bufVertexIndex	= gl.createBuffer();
+}
+
+CanvasGL.Context.Buffers.prototype.vertexPosition	= function(){ return this._bufVertexPosition;	}
+CanvasGL.Context.Buffers.prototype.textureCoord		= function(){ return this._bufTextureCoord;	}
+CanvasGL.Context.Buffers.prototype.vertexIndex		= function(){ return this._bufVertexIndex;	}
+
+CanvasGL.Context.Buffers.prototype.update	= function(drawImages, indexFirst, indexLast)
+{
+	this._updateVertexPositionsBuffers(drawImages, indexFirst, indexLast);
+	this._updateTextureCoordsBuffers(drawImages, indexFirst, indexLast);
+	this._updateVertexIndexBuffers(drawImages, indexFirst, indexLast);
+}
+
+CanvasGL.Context.Buffers.prototype._updateVertexPositionsBuffers	= function(drawImages, indexFirst, indexLast)
+{
+	var gl		= this._gl;
+	var viewportW	= gl.viewportWidth;
+	var viewportH	= gl.viewportHeight;
+
+	var appendVertexPosition	= function(values, offset,  x,y, width, height){
+		var pixelXToPosition	= function(x){
+			return + (x - viewportW/2) / (viewportW/2);
+		};
+		var pixelYToPosition	= function(y){
+			return - (y - viewportH/2) / (viewportH/2);
+		};
+		var minX	= pixelXToPosition(x);
+		var maxX	= pixelXToPosition(x+width);
+		var minY	= pixelYToPosition(y);
+		var maxY	= pixelYToPosition(y+height);
+		values[offset+0] = minX;	values[offset+1] = minY;
+		values[offset+2] = maxX;	values[offset+3] = minY;
+		values[offset+4] = maxX;	values[offset+4] = maxY;
+		values[offset+6] = minX;	values[offset+7] = maxY;
+	}
+
+	var values 	= new Float32Array((indexLast - indexFirst + 1) * 8);
+	for( var i = indexFirst; i <= indexLast; i++){
+		var drawImage	= drawImages[i];
+		appendVertexPosition(values, i*8, drawImage.dstX, drawImage.dstY, drawImage.dstW, drawImage.dstH);
+	}
+	
+	// sanity check - 
+	console.assert( values.length === (indexLast - indexFirst + 1) * 8);
+
+	var buffer	= this._bufVertexPosition;
+	gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+	gl.bufferData(gl.ARRAY_BUFFER, values, gl.STATIC_DRAW);
+	buffer.itemSize	= 2;
+	buffer.numItems	= values.length/buffer.itemSize;
+}
+
+
+CanvasGL.Context.Buffers.prototype._updateTextureCoordsBuffers	= function(drawImages, indexFirst, indexLast)
+{
+	var gl		= this._gl;
+	var image	= drawImages[indexFirst].img;
+	var imageW	= image.width;
+	var imageH	= image.height;
+
+	var appendTextureCoord	= function(arr, x,y, width, height){
+		var pixelXToPosition	= function(x){
+			return x / imageW;
+		};
+		var pixelYToPosition	= function(y){
+			return y / imageH;
+		};
+		var minX	= pixelXToPosition(x);
+		var maxX	= pixelXToPosition(x+width);
+		var minY	= pixelYToPosition(y);
+		var maxY	= pixelYToPosition(y+height);
+		arr.push(minX);	arr.push(minY);
+		arr.push(maxX);	arr.push(minY);
+		arr.push(maxX);	arr.push(maxY);
+		arr.push(minX);	arr.push(maxY);
+	};
+
+	// here to push the texture coordinates
+	var values 	= [];
+	for( var i = indexFirst; i <= indexLast; i++){
+		var drawImage	= drawImages[i];
+		appendTextureCoord(values, drawImage.srcX, drawImage.srcY, drawImage.srcW, drawImage.srcH)
+        }
+
+	// sanity check - 
+	//console.assert( values.length === (indexLast - indexFirst + 1) * 8);
+
+//console.log("buffer textureCorrd", values);
+
+	var buffer	= this._bufTextureCoord;
+	gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(values), gl.STATIC_DRAW);
+	buffer.itemSize = 2;
+	buffer.numItems = values.length/buffer.itemSize;
+}
+
+CanvasGL.Context.Buffers.prototype._updateVertexIndexBuffers	= function(drawImages, indexFirst, indexLast)
+{
+	var gl		= this._gl;
+// TODO this buffer always contains the same value... no need to recompute them every time
+	var values 	= new Array((indexLast - indexFirst + 1) * 6);
+	for(var i=0; i < (indexLast - indexFirst + 1); i++){
+		// face one
+		values.push(i*4+0);	values.push(i*4+1);	values.push(i*4+2);
+		// face two
+		values.push(i*4+0);	values.push(i*4+2);	values.push(i*4+3);
+	}
+
+	// sanity check - 
+	//console.assert( values.length === (indexLast - indexFirst + 1) * 6);
+
+//console.log("buffer vertexIndex", values);
+
+	var buffer	= this._bufVertexIndex;
+	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer);
+	gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(values), gl.STATIC_DRAW);
+	buffer.itemSize	= 1;
+	buffer.numItems	= values.length/buffer.itemSize;
+}
+
+
