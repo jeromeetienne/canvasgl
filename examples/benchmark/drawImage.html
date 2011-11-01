@@ -21,6 +21,8 @@
 
 	<script src="../vendor/webgl-2d/webgl-2d.js">		</script>
 
+<!--	<script src="../nowebgl.js">	</script>
+-->
 	<script src="../../src/canvasgl-core.js">		</script>
 	<script src="../../src/canvasgl-context.js">		</script>
 	<script src="../../src/canvasgl-proxyCtx.js">		</script>
@@ -32,15 +34,11 @@
 
 
 <body onload="init();">
-	<canvas id="canvas-rawCanvas2d" width="256" height="256"></canvas>
-	<canvas id="canvas-CanvasGL" width="256" height="256"></canvas>
-	<canvas id="canvas-WebGL2D" width="256" height="256"></canvas>
+	<canvas id="canvas-rawCanvas2d"	width="256" height="256"></canvas>
+	<canvas id="canvas-CanvasGL"	width="256" height="256"></canvas>
+	<canvas id="canvas-WebGL2D"	width="256" height="256"></canvas>
 	<script>
-		var usedTech	= "rawCanvas2d";
-		//var usedTech	= "CanvasGL";
-		//var usedTech	= "WebGL2D";
 		var canvas, ctx;
-
 		var neheImage, spriteImage;
 
 		// TODO this should be a THREEx
@@ -51,7 +49,8 @@
 			if( hasWebGL ){
 				var gl	= document.createElement( 'canvas' ).getContext( 'experimental-webgl' );
 				glAgent	= 'WebGL Vendor: ' + gl.getParameter( gl.VENDOR )
-						+ " - WebGL Renderer: " + gl.getParameter( gl.RENDERER );
+						+ " - "
+						+ "WebGL Renderer: " + gl.getParameter( gl.RENDERER );
 			}else{
 				glAgent	= "no WebGL available";
 			}
@@ -69,7 +68,7 @@
 
 			var flow	= Flow();
 			var backends	= ['rawCanvas2d', 'CanvasGL', 'WebGL2D'];
-			//var backends	= ['CanvasGL'];
+			var backends	= ['CanvasGL'];
 			backends.forEach(function(backend){
 				flow.seq(function(next){
 					initBench(backend, next);
@@ -133,7 +132,7 @@
 				var name	= bench.name;
 				var nbDrawImages= Math.round(nIterations * 10 * opsPerSec);
 				var padNumber	= function(x, n){ return String("      "+x).slice(-n); };
-				console.log(padNumber(nbDrawImages, 6), "ctx.drawImage() per Sec", ":", backend, ": ", name)
+				console.log(padNumber(nbDrawImages, 10), "ctx.drawImage() per Sec", ":", backend, ": ", name)
 				//console.log(String(bench)); console.dir(bench);
 			})
 			.on('complete', function() {
