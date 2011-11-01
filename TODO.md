@@ -1,11 +1,17 @@
+******************************************************************
+Long term:
+* do custom API tunned for image copy and high performance
+  * use WRAP_S/T
+  * blending or not ?
+  * if not blending, draw in reverse order with gl.depthFunc( gl.LESS );
+  * it is tuned for speed but dont uselessly diverge from canvas2d API
+* do canvas2d API layer for compatibility (ease inclusion)
+******************************************************************
 ProxyContext:
-- memoryleak ?
-- apparently the canvas arent freeed...
+- memoryleak ? YES
+- apparently the canvas and/or textures arent freeed...
   - normal or not ?
-- issue with transparent
-  - is the transaparent issue in drawImage
-  - or in the canvas drawing
-  - how can i know ?
+  - see deleteTexture
 
 DrawImage:
 - issue with transaparent
@@ -25,10 +31,3 @@ Benchmark:
 
 - make benchmark.js to compare each backend
   - so open each context, and make a suite for each test
-----------------------------
-* performance
-* benchmark
-* compatibility canvas 2D API
-* publication
-
-* does it fix the problem
