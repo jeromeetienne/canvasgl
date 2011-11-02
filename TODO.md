@@ -7,6 +7,9 @@ Long term:
   * it is tuned for speed but dont uselessly diverge from canvas2d API
 * do canvas2d API layer for compatibility (ease inclusion)
 ******************************************************************
+
+* handle nowebgl detection
+
 ProxyContext:
 - memoryleak ? YES
 - apparently the canvas and/or textures arent freeed...

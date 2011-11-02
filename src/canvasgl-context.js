@@ -28,7 +28,7 @@ CanvasGL.Context.prototype._initGL	= function()
 		gl.viewportHeight	= this._domElement.height;
 	}catch (e){}
 	// check for errors
-	if( !gl )	alert("Could not initialise WebGL, sorry :-(");
+	if( !gl )	throw "Could not initialise WebGL, sorry :-(";
 
 	this._gl	= gl;
 
@@ -182,6 +182,7 @@ CanvasGL.Context.prototype._renderImage	= function(drawImages, indexFirst, index
 	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer);
 	gl.drawElements(gl.TRIANGLES, buffer.numItems, gl.UNSIGNED_SHORT, 0);
 
+//this._unbindImage(image);
 	// honor this._glFinishOnUpdate
 	this._glFinishOnUpdate && gl.finish();
 }

@@ -14,6 +14,8 @@ NoWebGL.Fct.undefinedList	= [
 	'finish',
 	'viewport',
 	'clear',
+	'save',
+	'restore',
 
 	'clearColor',
 	'depthFunc',

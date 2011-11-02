@@ -68,7 +68,7 @@
 
 			var flow	= Flow();
 			var backends	= ['rawCanvas2d', 'CanvasGL', 'WebGL2D'];
-			var backends	= ['CanvasGL'];
+			//var backends	= ['CanvasGL'];
 			backends.forEach(function(backend){
 				flow.seq(function(next){
 					initBench(backend, next);

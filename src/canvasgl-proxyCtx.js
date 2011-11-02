@@ -59,9 +59,19 @@ CanvasGL.Context.proxyCall	= function(property, withFlush){
 }
 
 // define all the properties to proxy
-CanvasGL.Context._proxyGetterSetters	= ["fillStyle"];
-CanvasGL.Context._proxyCalls		= ["beginPath", "closePath", "moveTo", "lineTo"];
-CanvasGL.Context._proxyDrawCalls	= ["fillRect", "clearRect", "strokeRect", "stroke", "fill"];
+CanvasGL.Context._proxyGetterSetters	= [
+	"fillStyle",
+	"globalAlpha",
+];
+CanvasGL.Context._proxyCalls		= [
+	"beginPath", "closePath", "moveTo", "lineTo",
+	"save", "restore",
+	"rotate", "scale", "translate",
+];
+CanvasGL.Context._proxyDrawCalls	= [
+	"fillRect", "strokeRect", "clearRect",
+	"stroke", "fill",
+];
 
 // actually bind those calls into CanvasGL.Context.prototype
 CanvasGL.Context._proxyDrawCalls.forEach(function(property){
