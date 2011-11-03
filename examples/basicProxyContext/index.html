@@ -33,18 +33,18 @@
 <body onload="init();">
 	<canvas id="canvas" width="256" height="256"></canvas>
 	<script>
-		var usedTech	= "rawCanvas2d";
-		var usedTech	= "CanvasGL";
+		var backend	= "rawCanvas2d";
+		var backend	= "CanvasGL";
 		var canvas	= document.getElementById("canvas");
 		var ctx;
 		
 		function init(){
-			if( usedTech == "CanvasGL" ){
+			if( backend == "CanvasGL" ){
 				CanvasGL.bind(canvas)
 				ctx	= canvas.getContext('2d');
-			}else if( usedTech == "rawCanvas2d"){
+			}else if( backend == "rawCanvas2d"){
 				ctx	= canvas.getContext('2d');	
-			}else if( usedTech == "WebGL2D" ){
+			}else if( backend == "WebGL2D" ){
 				WebGL2D.enable(canvas);
 				ctx	= canvas.getContext('webgl-2d');	
 			}else	console.assert(false);
@@ -69,11 +69,13 @@
 				ctx.fill();			
 			}
 	
-			if( true ){			
+			if( true ){
+				ctx.save();
 				ctx.fillStyle = "rgb(0, 200,0)"; 
 				ctx.strokeRect(x, 10, 55, 50);
 				ctx.fillStyle = "rgb(200, 200,0)";
 				ctx.fillRect(30, 30, 55, 50);
+				ctx.restore();
 			}
 			
 			if( ctx instanceof CanvasGL.Context )	ctx.update();

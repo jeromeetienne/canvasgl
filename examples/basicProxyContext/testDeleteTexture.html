@@ -1,0 +1,36 @@
+<html>
+<body onload="init();">
+	<canvas id="canvas" width="256" height="256"></canvas>
+	<script>
+		var gl;
+		var canvas;
+
+		function init(){
+			var domElement	= document.getElementById('canvas');
+			gl	= domElement.getContext("experimental-webgl");
+			gl.viewportWidth	= domElement.width;
+			gl.viewportHeight	= domElement.height;
+
+			canvas	= document.createElement('canvas');
+			animate();
+		}
+	
+		function animate() {
+			setTimeout(animate, 1000/60);
+
+			// creating canvas here is required to reproduce
+			// - simply using the canvas created in init() wont reproduce
+			var canvas	= document.createElement('canvas');
+
+			var texture	= gl.createTexture();
+			gl.bindTexture	(gl.TEXTURE_2D, texture);
+
+			// this line is required for the leak 
+			gl.texImage2D	(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, canvas);
+
+			gl.deleteTexture(texture);
+		}
+	</script>
+</body>
+
+</html>
