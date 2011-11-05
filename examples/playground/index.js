@@ -4,9 +4,9 @@ var ctx;
 var neheImage, spriteImage;
 var stats;
 
-var usedTech		= "CanvasGL";
-//var usedTech		= "rawCanvas2d";
-//var usedTech		= "WebGL2D";
+var backend		= "CanvasGL";
+//var backend		= "rawCanvas2d";
+//var backend		= "WebGL2D";
 var boostCanvasGL	= false;
 
 // maybe replace that by window... or something
@@ -80,13 +80,12 @@ function init()
 {
 	var canvas	= document.getElementById("canvas");
 	
-
-	if( usedTech == "CanvasGL" ){
+	if( backend == "CanvasGL" ){
 		CanvasGL.bind(canvas)
 		ctx	= canvas.getContext('2d');	
-	}else if( usedTech == "rawCanvas2d"){
+	}else if( backend == "rawCanvas2d"){
 		ctx	= canvas.getContext('2d');	
-	}else if( usedTech == "WebGL2D" ){
+	}else if( backend == "WebGL2D" ){
 		WebGL2D.enable(canvas);
 		ctx	= canvas.getContext('webgl-2d');	
 	}else	console.assert(false);
@@ -95,7 +94,7 @@ function init()
 	buildGui(guiOptions);
 
 	// stats
-	if( false ){
+	if( true ){
 		stats = new Stats();
 		stats.domElement.style.position = 'absolute';
 		stats.domElement.style.bottom = '0px';
@@ -144,18 +143,18 @@ function animate()
 }
 
 var renderNSprites	= {
-	"CanvasGL"	: 5000,
+	"CanvasGL"	: 15000,
 	"rawCanvas2d"	: 1500,
 	"WebGL2D"	: 500
-}[usedTech];
+}[backend];
 var renderLastTime	= Date.now();
 var renderLastStats	= Date.now();
 
 function render()
 {
 	//buildDrawImages(ctx._gl.viewportWidth, ctx._gl.viewportHeight, renderNSprites);
-	//buildDrawImages(512,384, renderNSprites);
-	buildDrawImages2();
+	buildDrawImages(512,384, renderNSprites);
+	//buildDrawImages2();
 	if( ctx instanceof CanvasGL.Context )	ctx.update();
 
 	var present	= Date.now();

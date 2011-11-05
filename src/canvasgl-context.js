@@ -1,6 +1,10 @@
 /** namespace */
 var CanvasGL	= CanvasGL	|| {};
 
+//////////////////////////////////////////////////////////////////////////////////
+//		Initialisation							//
+//////////////////////////////////////////////////////////////////////////////////
+
 CanvasGL.Context	= function(domElement, opts)
 {
 	opts			= opts || {};
@@ -18,11 +22,9 @@ CanvasGL.Context.prototype._initGL	= function()
 	var gl;
 	try {
 		// get the context
-		if( typeof NoWebGL != 'undefined' ){
-			gl	= NoWebGL.getContext();
-		}else{
-			gl	= this._domElement.getContext("experimental-webgl");
-		}
+		gl	= this._domElement.getContext("experimental-webgl");
+//console.log("gl", gl);
+//console.dir(this._domElement.getContext);
 		// set the context dimensions
 		gl.viewportWidth	= this._domElement.width;
 		gl.viewportHeight	= this._domElement.height;
@@ -36,15 +38,18 @@ CanvasGL.Context.prototype._initGL	= function()
 
 	gl.enable(gl.DEPTH_TEST);
 	// gl.LESS is much faster. less stressing on fragment shader i guess
-	gl.depthFunc( gl.LEQUAL );
+	//gl.depthFunc( gl.LEQUAL );
+	//gl.depthFunc( gl.LESS );
+
 // TODO good stuff on init here
 // https://github.com/mrdoob/three.js/blob/master/src/renderers/WebGLRenderer.js#L159
 
-	gl.enable( gl.BLEND );
-	gl.blendEquationSeparate( gl.FUNC_ADD, gl.FUNC_ADD );
-	gl.blendFuncSeparate( gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA );
-
-	//gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+	if( false ){
+		gl.enable( gl.BLEND );
+		gl.blendEquationSeparate( gl.FUNC_ADD, gl.FUNC_ADD );
+		gl.blendFuncSeparate( gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA );		
+		//gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+	}
 
 	// clear the screen
 	gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
@@ -102,6 +107,10 @@ CanvasGL.Context.prototype.drawImage	= function(imgElement)
 	});
 }
 
+//////////////////////////////////////////////////////////////////////////////////
+//		Image								//
+//////////////////////////////////////////////////////////////////////////////////
+
 CanvasGL.Context.prototype._bindImage	= function(image)
 {
 	console.assert( !image._canvasglTexture );
@@ -134,6 +143,10 @@ CanvasGL.Context.prototype._isBoundImage	= function(image)
 {
 	return image._canvasglTexture ? true : false;
 }
+
+//////////////////////////////////////////////////////////////////////////////////
+//		_render								//
+//////////////////////////////////////////////////////////////////////////////////
 
 CanvasGL.Context.prototype._render	= function()
 {

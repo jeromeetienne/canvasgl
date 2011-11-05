@@ -20,9 +20,9 @@
 	<script src="../vendor/gowiththeflow.js/gowiththeflow.js">	</script>
 
 	<script src="../vendor/webgl-2d/webgl-2d.js">		</script>
-
-<!--	<script src="../nowebgl.js">	</script>
--->
+<!--
+	<script src="../nowebgl.js">	</script>
+-->	
 	<script src="../../src/canvasgl-core.js">		</script>
 	<script src="../../src/canvasgl-context.js">		</script>
 	<script src="../../src/canvasgl-proxyCtx.js">		</script>
@@ -82,7 +82,7 @@
 			var suite	= new Benchmark.Suite;
 			var nIterations	= 1;
 			// add tests
-			suite.add('render 10time same image with 10 update', function() {
+			suite.add('render 10time same image with 10 update', function(){
 				for(var j = 0; j < nIterations; j++ ){
 					for(var i = 0; i < 10; i++){
 						ctx.drawImage(spriteImage,  0, 0);
@@ -90,7 +90,7 @@
 					}
 				}
 			})
-			suite.add('render 10time same image with 1 update', function() {
+			suite.add('render 10time same image with 1 update', function(){
 				for(var j = 0; j < nIterations; j++ ){
 					for(var i = 0; i < 100; i += 10 ){
 						ctx.drawImage(spriteImage,  i, 0);
@@ -98,7 +98,7 @@
 				}
 				if( ctx instanceof CanvasGL.Context )	ctx.update();
 			})
-			suite.add('render 5time two images', function() {
+			suite.add('render 5time two images', function(){
 				for(var j = 0; j < nIterations; j++ ){
 					for(var i = 0; i < 50; i += 10 ){
 						ctx.drawImage(spriteImage,  i, 0);
